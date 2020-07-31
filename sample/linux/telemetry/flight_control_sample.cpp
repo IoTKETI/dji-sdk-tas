@@ -376,8 +376,7 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
         int numTopic = sizeof(topicList50Hz) / sizeof(topicList50Hz[0]);
         bool enableTimestamp = false;
 
-        bool pkgStatus = vehicle->subscribe->initPackageFromTopicList(
-            pkgIndex, numTopic, topicList50Hz, enableTimestamp, freq);
+        bool pkgStatus = vehicle->subscribe->initPackageFromTopicList(pkgIndex, numTopic, topicList50Hz, enableTimestamp, freq);
         if (!(pkgStatus))
         {
             return pkgStatus;
@@ -413,17 +412,13 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
     {
         currentSubscriptionGPS = vehicle->subscribe->getValue<TOPIC_GPS_FUSED>();
         originSubscriptionGPS = currentSubscriptionGPS;
-        localOffsetFromGpsOffset(vehicle, localOffset,
-                                 static_cast<void *>(&currentSubscriptionGPS),
-                                 static_cast<void *>(&originSubscriptionGPS));
+        localOffsetFromGpsOffset(vehicle, localOffset, static_cast<void *>(&currentSubscriptionGPS), static_cast<void *>(&originSubscriptionGPS));
     }
     else
     {
         currentBroadcastGP = vehicle->broadcast->getGlobalPosition();
         originBroadcastGP = currentBroadcastGP;
-        localOffsetFromGpsOffset(vehicle, localOffset,
-                                 static_cast<void *>(&currentBroadcastGP),
-                                 static_cast<void *>(&originBroadcastGP));
+        localOffsetFromGpsOffset(vehicle, localOffset, static_cast<void *>(&currentBroadcastGP), static_cast<void *>(&originBroadcastGP));
     }
 
     // Get initial offset. We will update this in a loop later.
@@ -475,19 +470,25 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
    *  from the current position - until we get within a threshold of the goal.
    *  From that point on, we send the remaining distance as the setpoint.
    */
-    if (xOffsetDesired > 0)
+    if (xOffsetDesired > 0) {
         xCmd = (xOffsetDesired < speedFactor) ? xOffsetDesired : speedFactor;
-    else if (xOffsetDesired < 0)
+    }
+    else if (xOffsetDesired < 0) {
         xCmd = (xOffsetDesired > -1 * speedFactor) ? xOffsetDesired : -1 * speedFactor;
-    else
+    }
+    else {
         xCmd = 0;
+    }
 
-    if (yOffsetDesired > 0)
+    if (yOffsetDesired > 0) {
         yCmd = (yOffsetDesired < speedFactor) ? yOffsetDesired : speedFactor;
-    else if (yOffsetDesired < 0)
+    }
+    else if (yOffsetDesired < 0) {
         yCmd = (yOffsetDesired > -1 * speedFactor) ? yOffsetDesired : -1 * speedFactor;
-    else
+    }
+    else {
         yCmd = 0;
+    }
 
     if (!vehicle->isM100() && !vehicle->isLegacyM600())
     {
@@ -502,7 +503,6 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
     loop_count = 0;
     while (elapsedTimeInMs < timeoutInMilSec)
     {
-
         vehicle->control->positionAndYawCtrl(xCmd, yCmd, zCmd, yawDesiredRad / DEG2RAD);
 
         //usleep(cycleTimeInMs * 1000);
@@ -513,7 +513,7 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
         //loop_count = 0;
         //break;
         //}
-        printf("ZZZZZ- %ld\r\n", loop_count);
+        printf("ZZZZZ- %ld\r\n", elapsedTimeInMs);
 
         //! Get current position in required coordinates and units
         if (!vehicle->isM100() && !vehicle->isLegacyM600())
@@ -561,10 +561,13 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
         printf("[0] zoffr <= zDeadband = %d\r\n", (zoffr <= zDeadband));
 
         //! See if we need to modify the setpoint
-        if (std::abs(xOffsetRemaining) < speedFactor)
+        if (std::abs(xOffsetRemaining) < speedFactor) {
             xCmd = xOffsetRemaining;
-        if (std::abs(yOffsetRemaining) < speedFactor)
+        }
+        
+        if (std::abs(yOffsetRemaining) < speedFactor) {
             yCmd = yOffsetRemaining;
+        }
 
         if (vehicle->isM100() &&
             std::abs(xOffsetRemaining) <= posThresholdInM &&
@@ -634,8 +637,7 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
         std::cout << "Task timeout!\n";
         if (!vehicle->isM100() && !vehicle->isLegacyM600())
         {
-            ACK::ErrorCode ack =
-                vehicle->subscribe->removePackage(pkgIndex, responseTimeout);
+            ACK::ErrorCode ack = vehicle->subscribe->removePackage(pkgIndex, responseTimeout);
             if (ACK::getError(ack))
             {
                 std::cout << "Error unsubscribing; please restart the drone/FC to get "
@@ -648,8 +650,7 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
     std::cout << "move to Position SUCCESS!\n";
     if (!vehicle->isM100() && !vehicle->isLegacyM600())
     {
-        ACK::ErrorCode ack =
-            vehicle->subscribe->removePackage(pkgIndex, responseTimeout);
+        ACK::ErrorCode ack = vehicle->subscribe->removePackage(pkgIndex, responseTimeout);
         if (ACK::getError(ack))
         {
             std::cout << "Error unsubscribing; please restart the drone/FC to get back "

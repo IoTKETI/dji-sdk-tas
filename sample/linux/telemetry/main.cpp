@@ -77,19 +77,19 @@ void commandAction(Vehicle* vehicle) {
 		inProcessing = 0;
 		ACTION_EVENT &= ~MOVE;
 	}
-	else if(ACTION_EVENT & ALT) {
+	// else if(ACTION_EVENT & ALT) {
 		
-		printf("\r\nALT\r\n");
+	// 	printf("\r\nALT\r\n");
 		
-		inProcessing = 1;
+	// 	inProcessing = 1;
 		
-		//vehicle->obtainCtrlAuthority(functionTimeout);
+	// 	//vehicle->obtainCtrlAuthority(functionTimeout);
 		
-		moveByPositionOffset(vehicle, g_xoffd, g_yoffd, g_zoffd, g_yawd, g_pth, g_yawth);
+	// 	moveByPositionOffset(vehicle, g_xoffd, g_yoffd, g_zoffd, g_yawd, g_pth, g_yawth);
 		
-		inProcessing = 0;
-		ACTION_EVENT &= ~ALT;
-	}
+	// 	inProcessing = 0;
+	// 	ACTION_EVENT &= ~ALT;
+	// }
 	// else if(ACTION_EVENT & WAYPOINT) {
 		
 	// 	printf("\r\nWAYPOINT\r\n");
@@ -148,21 +148,21 @@ void *action_broadcast_data(void *arg)
 	}
 }
 
-void *event_handler(void *arg)
-{
-	int sockfd;
-	Vehicle* vehicle;
-	int readn, writen;
-	char buf[256];
-	Data* d  = (Data*)arg;
-	sockfd = d->s;
-	vehicle = d->v;
+// void *event_handler(void *arg)
+// {
+// 	int sockfd;
+// 	Vehicle* vehicle;
+// 	int readn, writen;
+// 	char buf[256];
+// 	Data* d  = (Data*)arg;
+// 	sockfd = d->s;
+// 	vehicle = d->v;
 
-	while (1)
-	{
-		commandAction(vehicle);
-	}
-}
+// 	while (1)
+// 	{
+// 		commandAction(vehicle);
+// 	}
+// }
 
 void *action_takeoff(void *arg)
 {
@@ -268,6 +268,31 @@ void *action_waypoint(void *arg)
 	}
 }
 
+void *action_alt(void *arg)
+{
+	int sockfd;
+	Vehicle* vehicle;
+	int readn, writen;
+	char buf[256];
+	Data* d  = (Data*)arg;
+	sockfd = d->s;
+	vehicle = d->v;
+
+	while (1)
+	{
+		if(ACTION_EVENT & ALT) {
+			ACTION_EVENT &= ~ALT;
+		
+			printf("\r\nALT\r\n");
+			
+			inProcessing = 1;
+			
+			moveByPositionOffset(vehicle, g_xoffd, g_yoffd, g_zoffd, g_yawd, g_pth, g_yawth);
+			
+			inProcessing = 0;
+		}
+	}
+}
 
 int main(int argc, char *argv[])
 {
@@ -290,8 +315,8 @@ int main(int argc, char *argv[])
 	int sockfd, portno, n;
 	struct sockaddr_in serv_addr;
 	struct hostent *server;
-	pthread_t thread_broadcast_data, thread_t2, thread_takeoff, thread_land, thread_rth, thread_waypoint;
-	int th_id_broadcast_data, th_id2, th_id_takeoff, th_id_land, th_id_rth, th_id_waypoint;
+	pthread_t thread_broadcast_data, thread_t2, thread_takeoff, thread_land, thread_rth, thread_waypoint, thread_alt;
+	int th_id_broadcast_data, th_id2, th_id_takeoff, th_id_land, th_id_rth, th_id_waypoint, th_id_alt;
 	char buffer[256];
 	int time = 0;
 
@@ -314,13 +339,13 @@ int main(int argc, char *argv[])
 	d.v = vehicle;
 	d.s = sockfd;
 
-	th_id2 = pthread_create(&thread_t2, NULL, event_handler, (void *)&d);
-	if (th_id2 != 0)
-	{
-		perror("Thread Create 2 Error");
-		return 1;
-	}
-	pthread_detach(thread_t2);
+	// th_id2 = pthread_create(&thread_t2, NULL, event_handler, (void *)&d);
+	// if (th_id2 != 0)
+	// {
+	// 	perror("Thread Create 2 Error");
+	// 	return 1;
+	// }
+	// pthread_detach(thread_t2);
 
 	th_id_broadcast_data = pthread_create(&thread_broadcast_data, NULL, action_broadcast_data, (void *)&d);
 	if (th_id_broadcast_data != 0)
@@ -362,6 +387,15 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	pthread_detach(thread_waypoint);
+
+	th_id_alt = pthread_create(&thread_alt, NULL, action_alt, (void *)&d);
+	if (th_id_alt != 0)
+	{
+		perror("Thread of alt Create Error");
+		return 1;
+	}
+	pthread_detach(thread_alt);
+
 
 	vehicle->obtainCtrlAuthority(functionTimeout);
 
