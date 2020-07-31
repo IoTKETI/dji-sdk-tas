@@ -477,7 +477,11 @@ int main(int argc, char *argv[])
 					g_responseTimeout = responseTimeout;
 					g_lat = (strtof(str[1].c_str(), 0)/57.295779513082320876798154814);
 					g_lon = (strtof(str[2].c_str(), 0)/57.295779513082320876798154814);
-					g_alt = g_cur_alt; //strtof(str[3].c_str(), 0);
+					g_alt = strtof(str[3].c_str(), 0);
+
+					if(g_alt == 0.0) {
+						g_alt = g_cur_alt;
+					}
 					
 					printf("g command = g_lat, g_lon, g_alt: %f, %f, %f\r\n", g_lat, g_lon, g_alt);
 
