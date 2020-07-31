@@ -701,8 +701,7 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
     if (!vehicle->isM100() && !vehicle->isLegacyM600())
     {
         loop_count = 0;
-        while (vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() !=
-                   VehicleStatus::DisplayMode::MODE_AUTO_LANDING &&
+        while (vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() != VehicleStatus::DisplayMode::MODE_AUTO_LANDING &&
                landingNotStarted < timeoutCycles)
         {
             landingNotStarted++;
@@ -955,8 +954,7 @@ bool monitoredGoHome(Vehicle *vehicle, int timeout)
         ACK::ErrorCode ack = vehicle->subscribe->removePackage(pkgIndex, timeout);
         if (ACK::getError(ack))
         {
-            std::cout << "Error unsubscribing; please restart the drone/FC to get "
-                         "back to a clean state.\n";
+            std::cout << "Error unsubscribing; please restart the drone/FC to get back to a clean state.\n";
         }
         return false;
     }
@@ -967,28 +965,30 @@ bool monitoredGoHome(Vehicle *vehicle, int timeout)
 
     // Second check: Finished landing
 
+    timeoutCycles = 10;
     loop_count = 0;
-    while (vehicle->broadcast->getStatus().flight ==
-           DJI::OSDK::VehicleStatus::M100FlightStatus::FINISHING_LANDING)
+    while (vehicle->broadcast->getStatus().flight == DJI::OSDK::VehicleStatus::M100FlightStatus::FINISHING_LANDING && 
+           loop_count < timeoutCycles)
     {
-        sleep(1);
+        usleep(100000);
+        loop_count++;
         printf("DDDDD- %ld", loop_count);
     }
 
     Telemetry::GlobalPosition gp;
+    timeoutCycles = 20;
     loop_count = 0;
     do
     {
-        sleep(2);
+        usleep(100000);
+        loop_count++;
         gp = vehicle->broadcast->getGlobalPosition();
         printf("EEEEE- %ld", loop_count);
-    } while (gp.altitude != 0);
+    } while (gp.altitude != 0 && loop_count < timeoutCycles);
 
     if (gp.altitude != 0)
     {
-        std::cout
-            << "Landing finished, but the aircraft is in an unexpected mode. "
-               "Please connect DJI GO.\n";
+        std::cout << "Landing finished, but the aircraft is in an unexpected mode. Please connect DJI GO.\n";
         return false;
     }
     else

@@ -102,19 +102,19 @@ void commandAction(Vehicle* vehicle) {
 	// 	inProcessing = 0;
 	// 	ACTION_EVENT &= ~WAYPOINT;
 	// }
-	else if(ACTION_EVENT & RTH) {
+	// else if(ACTION_EVENT & RTH) {
 		
-		printf("\r\nRTH\r\n");
+	// 	printf("\r\nRTH\r\n");
 		
-		inProcessing = 1;
+	// 	inProcessing = 1;
 		
-		//vehicle->obtainCtrlAuthority(functionTimeout);
+	// 	//vehicle->obtainCtrlAuthority(functionTimeout);
 		
-		monitoredGoHome(vehicle);
+	// 	monitoredGoHome(vehicle);
 		
-		inProcessing = 0;
-		ACTION_EVENT &= ~RTH;
-	}
+	// 	inProcessing = 0;
+	// 	ACTION_EVENT &= ~RTH;
+	// }
 }
 
 
@@ -215,6 +215,32 @@ void *action_land(void *arg)
 	}
 }
 
+void *action_rth(void *arg)
+{
+	int sockfd;
+	Vehicle* vehicle;
+	int readn, writen;
+	char buf[256];
+	Data* d  = (Data*)arg;
+	sockfd = d->s;
+	vehicle = d->v;
+
+	while (1)
+	{
+		if(ACTION_EVENT & RTH) {
+			ACTION_EVENT &= ~RTH;
+
+			printf("\r\nRTH\r\n");
+			
+			inProcessing = 1;
+			
+			monitoredGoHome(vehicle);
+			
+			inProcessing = 0;
+		}
+	}
+}
+
 void *action_waypoint(void *arg)
 {
 	int sockfd;
@@ -242,7 +268,6 @@ void *action_waypoint(void *arg)
 }
 
 
-
 int main(int argc, char *argv[])
 {
 	// Setup OSDK.
@@ -264,8 +289,8 @@ int main(int argc, char *argv[])
 	int sockfd, portno, n;
 	struct sockaddr_in serv_addr;
 	struct hostent *server;
-	pthread_t thread_broadcast_data, thread_t2, thread_takeoff, thread_land, thread_waypoint;
-	int th_id_broadcast_data, th_id2, th_id_takeoff, th_id_land, th_id_waypoint;
+	pthread_t thread_broadcast_data, thread_t2, thread_takeoff, thread_land, thread_rth, thread_waypoint;
+	int th_id_broadcast_data, th_id2, th_id_takeoff, th_id_land, th_id_rth, th_id_waypoint;
 	char buffer[256];
 	int time = 0;
 
@@ -319,6 +344,15 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	pthread_detach(thread_land);
+
+	th_id_rth = pthread_create(&thread_rth, NULL, action_rth, (void *)&d);
+	if (th_id_rth != 0)
+	{
+		perror("Thread of rth Create Error");
+		return 1;
+	}
+	pthread_detach(thread_rth);
+
 
 	th_id_waypoint = pthread_create(&thread_waypoint, NULL, action_waypoint, (void *)&d);
 	if (th_id_waypoint != 0)
