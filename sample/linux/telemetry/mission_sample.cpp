@@ -35,6 +35,15 @@
 using namespace DJI::OSDK;
 using namespace DJI::OSDK::Telemetry;
 
+void mission_delay_loop_ms(unsigned int timeout_ms) {
+	unsigned long timeout_count = (timeout_ms * 30000);
+	unsigned long i= 0;
+	
+	for(i = 0; i < timeout_count; i++) {
+	}
+}
+
+
 bool setUpSubscription(DJI::OSDK::Vehicle *vehicle, int responseTimeout)
 {
     // Telemetry: Verify the subscription
@@ -102,7 +111,8 @@ bool runWaypointMission(Vehicle *vehicle, uint8_t numWaypoints, int responseTime
             std::cout << "Failed to set up Subscription!" << std::endl;
             return false;
         }
-        sleep(1);
+        //sleep(1);
+        mission_delay_loop_ms(1000);
     }
 
     // Waypoint Mission : Initialization
@@ -292,7 +302,8 @@ bool runHotpointMission(Vehicle *vehicle, int responseTimeout, float32_t lat, fl
             std::cout << "Failed to set up Subscription!" << std::endl;
             return false;
         }
-        sleep(1);
+        //sleep(1);
+        mission_delay_loop_ms(1000);
     }
 
     // Global position retrieved via subscription
@@ -337,7 +348,8 @@ bool runHotpointMission(Vehicle *vehicle, int responseTimeout, float32_t lat, fl
     }
     else
     {
-        sleep(15);
+        //sleep(15);
+        mission_delay_loop_ms(15000);
     }
 
     // Start

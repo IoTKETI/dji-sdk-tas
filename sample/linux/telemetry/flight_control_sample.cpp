@@ -19,6 +19,15 @@ uint32_t loop_count = 0;
 using namespace DJI::OSDK;
 using namespace DJI::OSDK::Telemetry;
 
+void flight_delay_loop_ms(unsigned int timeout_ms) {
+	unsigned long timeout_count = (timeout_ms * 30000);
+	unsigned long i= 0;
+	
+	for(i = 0; i < timeout_count; i++) {
+	}
+}
+
+
 /*! Monitored Takeoff (Blocking API call). Return status as well as ack.
     This version of takeoff makes sure your aircraft actually took off
     and only returns when takeoff is complete.
@@ -86,7 +95,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                motorsNotStarted < timeoutCycles)
         {
             motorsNotStarted++;
-            usleep(10000);
+            //usleep(10000);
+            flight_delay_loop_ms(10);
             printf("GGGGG- %ld", loop_count);
         }
 
@@ -112,7 +122,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                motorsNotStarted < timeoutCycles)
         {
             motorsNotStarted++;
-            usleep(10000);
+            //usleep(10000);
+            flight_delay_loop_ms(10);
             printf("FFFFF- %ld", loop_count);
         }
 
@@ -128,7 +139,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                motorsNotStarted < timeoutCycles)
         {
             motorsNotStarted++;
-            usleep(10000);
+            //usleep(10000);
+            flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
             //loop_count = 0;
@@ -156,7 +168,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            usleep(10000);
+            //usleep(10000);
+            flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
             //loop_count = 0;
@@ -188,7 +201,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            usleep(10000);
+            //usleep(10000);
+            flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
             //loop_count = 0;
@@ -204,12 +218,14 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
     }
     else // M100
     {
+        stillOnGround = 0;
         loop_count = 0;
         while ((vehicle->broadcast->getStatus().flight != DJI::OSDK::VehicleStatus::M100FlightStatus::IN_AIR_STANDBY) &&
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            usleep(10000);
+            //usleep(10000);
+            flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
             //loop_count = 0;
@@ -220,20 +236,21 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
 
         if (stillOnGround < timeoutCycles)
         {
-            std::cout << "Aircraft in air!" << std::endl;
+            printf("Aircraft in air!\n");
         }
     }
 
     // Final check: Finished takeoff
     if (!vehicle->isM100() && !vehicle->isLegacyM600())
     {
-        timeoutCycles = 100;
+        timeoutCycles = 50;
         loop_count = 0;
         while ((vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() == VehicleStatus::DisplayMode::MODE_ASSISTED_TAKEOFF ||
                vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() == VehicleStatus::DisplayMode::MODE_AUTO_TAKEOFF) &&
                loop_count < timeoutCycles)
         {
-            usleep(10000);
+            //usleep(10000);
+            flight_delay_loop_ms(100);
             loop_count++;
             printf("LLLLL- %ld", loop_count);
         }
@@ -279,7 +296,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
         loop_count = 0;
         do
         {
-            usleep(300000);
+            //usleep(300000);
+            flight_delay_loop_ms(300);
             currentHeight = vehicle->broadcast->getGlobalPosition();
             delta = fabs(currentHeight.altitude - deltaHeight.altitude);
             deltaHeight.altitude = currentHeight.altitude;
@@ -376,7 +394,8 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
     }
 
     // Wait for data to come in
-    sleep(1);
+    //sleep(1);
+    flight_delay_loop_ms(1000);
 
     // Get data
 
@@ -486,7 +505,8 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
 
         vehicle->control->positionAndYawCtrl(xCmd, yCmd, zCmd, yawDesiredRad / DEG2RAD);
 
-        usleep(cycleTimeInMs * 1000);
+        //usleep(cycleTimeInMs * 1000);
+        flight_delay_loop_ms(cycleTimeInMs);
         elapsedTimeInMs += cycleTimeInMs;
         //loop_count++;
         //if(loop_count > 16384) {
@@ -597,7 +617,8 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
         while (brakeCounter < withinControlBoundsTimeReqmt)
         {
             vehicle->control->emergencyBrake();
-            usleep(cycleTimeInMs);
+            //usleep(cycleTimeInMs);
+            flight_delay_loop_ms(cycleTimeInMs);
             brakeCounter += cycleTimeInMs;
             //loop_count++;
             //if(loop_count > 16384) {
@@ -705,7 +726,9 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
                landingNotStarted < timeoutCycles)
         {
             landingNotStarted++;
-            usleep(10000);
+            //usleep(10000);
+            flight_delay_loop_ms(10);
+            
             printf("NNNNN- %ld", loop_count);
         }
 
@@ -734,21 +757,14 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
                landingNotStarted < timeoutCycles)
         {
             landingNotStarted++;
-            usleep(10000);
+            //usleep(10000);
+            flight_delay_loop_ms(10);
             printf("PPPPP- %ld", loop_count);
         }
 
         if (landingNotStarted >= timeoutCycles)
         {
             std::cout << "Landing failed. Aircraft is still in the air." << std::endl;
-            
-            // Cleanup before return
-            ACK::ErrorCode ack = vehicle->subscribe->removePackage(pkgIndex, timeout);
-            if (ACK::getError(ack))
-            {
-                std::cout << "Error unsubscribing; please restart the drone/FC to get back to a clean state.\n";
-            }
-
             return false;
         }
         else
@@ -766,7 +782,8 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
                vehicle->subscribe->getValue<TOPIC_STATUS_FLIGHT>() == VehicleStatus::FlightStatus::IN_AIR &&
                loop_count < timeoutCycles)
         {
-            usleep(100000);
+            //usleep(100000);
+            flight_delay_loop_ms(100);
             loop_count++;
             printf("QQQQQ- %ld", loop_count);
         }
@@ -794,7 +811,8 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
         while (vehicle->broadcast->getStatus().flight >DJI::OSDK::VehicleStatus::FlightStatus::STOPED &&
                loop_count < timeoutCycles)
         {
-            usleep(100000);
+            //usleep(100000);
+            flight_delay_loop_ms(100);
             loop_count++;
             printf("AAAAA - %ld", loop_count);
         }
@@ -803,7 +821,8 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
         loop_count = 0;
         do
         {
-            usleep(100000);
+            //usleep(100000);
+            flight_delay_loop_ms(100);
             loop_count++;
             gp = vehicle->broadcast->getGlobalPosition();
             printf("gp.alttitude %ld", loop_count);
@@ -826,7 +845,8 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
         while (vehicle->broadcast->getStatus().flight == DJI::OSDK::VehicleStatus::M100FlightStatus::FINISHING_LANDING &&
                loop_count < timeoutCycles)
         {
-            usleep(100000);
+            //usleep(100000);
+            flight_delay_loop_ms(100);
             loop_count++;
             printf("BBBBB- %ld", loop_count);
         }
@@ -835,7 +855,8 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
         loop_count = 0;
         do
         {
-            usleep(100000);
+            //usleep(100000);
+            flight_delay_loop_ms(100);
             loop_count++;
             gp = vehicle->broadcast->getGlobalPosition();
             printf("gp.alttitude %ld", loop_count);
@@ -970,7 +991,8 @@ bool monitoredGoHome(Vehicle *vehicle, int timeout)
     while (vehicle->broadcast->getStatus().flight == DJI::OSDK::VehicleStatus::M100FlightStatus::FINISHING_LANDING && 
            loop_count < timeoutCycles)
     {
-        usleep(100000);
+        //usleep(100000);
+        flight_delay_loop_ms(100);
         loop_count++;
         printf("DDDDD- %ld", loop_count);
     }
@@ -980,7 +1002,8 @@ bool monitoredGoHome(Vehicle *vehicle, int timeout)
     loop_count = 0;
     do
     {
-        usleep(100000);
+        //usleep(100000);
+        flight_delay_loop_ms(100);
         loop_count++;
         gp = vehicle->broadcast->getGlobalPosition();
         printf("EEEEE- %ld", loop_count);

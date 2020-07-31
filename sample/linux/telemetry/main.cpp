@@ -369,13 +369,14 @@ int main(int argc, char *argv[])
 	{
 		if (recv(sockfd, buffer, 255, MSG_DONTWAIT) != -1)
 		{
-			printf(buffer);
+			//printf("Data : %s\n", buffer);
+			
 			if(inProcessing == 1) {
 				printf("\r\nDrone is IN PROCESSING\r\n");
-				memset(buffer, 0, sizeof(char)* 256);
+				//memset(buffer, 0, sizeof(char)* 256);
 			}
 			else {
-				printf("Data : %s\n", buffer);
+				//printf("Data : %s\n", buffer);
 				//printf(buffer);
 
 				char* token = NULL;
@@ -390,7 +391,7 @@ int main(int argc, char *argv[])
 				{
 					printf("token = %s\n", token);
 					str[i] = string(token);
-					cout<<str[i]<<"\n";
+					cout << str[i] << "\n";
 					token = strtok(NULL, split);
 					i++;
 				}
@@ -455,7 +456,7 @@ int main(int argc, char *argv[])
 					break;
 				}
 					
-				memset(buffer, 0, sizeof(char)* 256);
+				//memset(buffer, 0, sizeof(char)* 256);
 			}
 		}
 		
