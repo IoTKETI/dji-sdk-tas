@@ -87,11 +87,6 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
         {
             motorsNotStarted++;
             usleep(10000);
-            //loop_count++;
-            //if(loop_count > 16384) {
-            //loop_count = 0;
-            //break;
-            //}
             printf("GGGGG- %ld", loop_count);
         }
 
@@ -118,11 +113,6 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
         {
             motorsNotStarted++;
             usleep(10000);
-            //loop_count++;
-            //if(loop_count > 16384) {
-            //loop_count = 0;
-            //break;
-            //}
             printf("FFFFF- %ld", loop_count);
         }
 
@@ -681,8 +671,7 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
         int numTopic = sizeof(topicList10Hz) / sizeof(topicList10Hz[0]);
         bool enableTimestamp = false;
 
-        bool pkgStatus = vehicle->subscribe->initPackageFromTopicList(
-            pkgIndex, numTopic, topicList10Hz, enableTimestamp, freq);
+        bool pkgStatus = vehicle->subscribe->initPackageFromTopicList(pkgIndex, numTopic, topicList10Hz, enableTimestamp, freq);
         if (!(pkgStatus))
         {
             return pkgStatus;
@@ -718,101 +707,96 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
         {
             landingNotStarted++;
             usleep(10000);
-            //loop_count++;
-            //if(loop_count > 16384) {
-            //loop_count = 0;
-            //break;
-            //}
             printf("NNNNN- %ld", loop_count);
+        }
+
+        if (landingNotStarted >= timeoutCycles)
+        {
+            std::cout << "Landing failed. Aircraft is still in the air." << std::endl;
+            
+            // Cleanup before return
+            ACK::ErrorCode ack = vehicle->subscribe->removePackage(pkgIndex, timeout);
+            if (ACK::getError(ack))
+            {
+                std::cout << "Error unsubscribing; please restart the drone/FC to get back to a clean state.\n";
+            }
+
+            return false;
+        }
+        else
+        {
+            std::cout << "Landing...\n";
         }
     }
     else if (vehicle->isM100())
     {
         loop_count = 0;
-        while (vehicle->broadcast->getStatus().flight !=
-                   DJI::OSDK::VehicleStatus::M100FlightStatus::LANDING &&
+        while (vehicle->broadcast->getStatus().flight != DJI::OSDK::VehicleStatus::M100FlightStatus::LANDING &&
                landingNotStarted < timeoutCycles)
         {
             landingNotStarted++;
             usleep(10000);
-            //loop_count++;
-            //if(loop_count > 16384) {
-            //loop_count = 0;
-            //break;
-            //}
             printf("PPPPP- %ld", loop_count);
         }
-    }
 
-    if (landingNotStarted == timeoutCycles)
-    {
-        std::cout << "Landing failed. Aircraft is still in the air." << std::endl;
-        // Cleanup before return
+        if (landingNotStarted >= timeoutCycles)
+        {
+            std::cout << "Landing failed. Aircraft is still in the air." << std::endl;
+            
+            // Cleanup before return
+            ACK::ErrorCode ack = vehicle->subscribe->removePackage(pkgIndex, timeout);
+            if (ACK::getError(ack))
+            {
+                std::cout << "Error unsubscribing; please restart the drone/FC to get back to a clean state.\n";
+            }
 
-        //ACK::ErrorCode ack = vehicle->subscribe->removePackage(pkgIndex, timeout);
-        //if (ACK::getError(ack))
-        //{
-        //std::cout << "Error unsubscribing; please restart the drone/FC to get "
-        //"back to a clean state.\n";
-        //}
-
-        return false;
-    }
-    else
-    {
-        std::cout << "Landing...\n";
+            return false;
+        }
+        else
+        {
+            std::cout << "Landing...\n";
+        }
     }
 
     // Second check: Finished landing
     if (!vehicle->isM100() && !vehicle->isLegacyM600())
     {
+        timeoutCycles = 20;
         loop_count = 0;
-        while (vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() ==
-                   VehicleStatus::DisplayMode::MODE_AUTO_LANDING &&
-               vehicle->subscribe->getValue<TOPIC_STATUS_FLIGHT>() ==
-                   VehicleStatus::FlightStatus::IN_AIR)
+        while (vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() == VehicleStatus::DisplayMode::MODE_AUTO_LANDING &&
+               vehicle->subscribe->getValue<TOPIC_STATUS_FLIGHT>() == VehicleStatus::FlightStatus::IN_AIR &&
+               loop_count < timeoutCycles)
         {
-            sleep(1);
+            usleep(100000);
             loop_count++;
-            if (loop_count > 16384)
-            {
-                loop_count = 0;
-                break;
-            }
             printf("QQQQQ- %ld", loop_count);
         }
 
-        if (vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() !=
-                VehicleStatus::DisplayMode::MODE_P_GPS ||
-            vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() !=
-                VehicleStatus::DisplayMode::MODE_ATTITUDE)
+        if (vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() != VehicleStatus::DisplayMode::MODE_P_GPS ||
+            vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() != VehicleStatus::DisplayMode::MODE_ATTITUDE)
         {
             std::cout << "Successful landing!\n";
         }
         else
         {
-            std::cout
-                << "Landing finished, but the aircraft is in an unexpected mode. "
-                   "Please connect DJI GO.\n";
+            std::cout << "Landing finished, but the aircraft is in an unexpected mode. Please connect DJI GO.\n";
             ACK::ErrorCode ack = vehicle->subscribe->removePackage(pkgIndex, timeout);
             if (ACK::getError(ack))
             {
-                std::cout << "Error unsubscribing; please restart the drone/FC to get "
-                             "back to a clean state.\n";
+                std::cout << "Error unsubscribing; please restart the drone/FC to get back to a clean state.\n";
             }
             return false;
         }
     }
     else if (vehicle->isLegacyM600())
     {
+        timeoutCycles = 20;
         loop_count = 0;
-        while (vehicle->broadcast->getStatus().flight >
-               DJI::OSDK::VehicleStatus::FlightStatus::STOPED)
+        while (vehicle->broadcast->getStatus().flight >DJI::OSDK::VehicleStatus::FlightStatus::STOPED &&
+               loop_count < timeoutCycles)
         {
-            //sleep(1);
+            usleep(100000);
             loop_count++;
-            while (loop_count < 16384)
-                ;
             printf("AAAAA - %ld", loop_count);
         }
 
@@ -820,20 +804,15 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
         loop_count = 0;
         do
         {
-            //sleep(2);
+            usleep(100000);
             loop_count++;
-            while (loop_count < 16384)
-                ;
             gp = vehicle->broadcast->getGlobalPosition();
-
             printf("gp.alttitude %ld", loop_count);
-        } while (gp.altitude != 0);
+        } while (gp.altitude != 0 && loop_count < timeoutCycles);
 
         if (gp.altitude != 0)
         {
-            std::cout
-                << "Landing finished, but the aircraft is in an unexpected mode. "
-                   "Please connect DJI GO.\n";
+            std::cout << "Landing finished, but the aircraft is in an unexpected mode. Please connect DJI GO.\n";
             return false;
         }
         else
@@ -843,14 +822,13 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
     }
     else // M100
     {
+        timeoutCycles = 20;
         loop_count = 0;
-        while (vehicle->broadcast->getStatus().flight ==
-               DJI::OSDK::VehicleStatus::M100FlightStatus::FINISHING_LANDING)
+        while (vehicle->broadcast->getStatus().flight == DJI::OSDK::VehicleStatus::M100FlightStatus::FINISHING_LANDING &&
+               loop_count < timeoutCycles)
         {
-            //sleep(1);
+            usleep(100000);
             loop_count++;
-            while (loop_count < 16384)
-                ;
             printf("BBBBB- %ld", loop_count);
         }
 
@@ -858,19 +836,15 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
         loop_count = 0;
         do
         {
-            //sleep(2);
+            usleep(100000);
             loop_count++;
-            while (loop_count < 16384)
-                ;
             gp = vehicle->broadcast->getGlobalPosition();
-            printf("CCCCC- %ld", loop_count);
-        } while (gp.altitude != 0);
+            printf("gp.alttitude %ld", loop_count);
+        } while (gp.altitude != 0 && loop_count < timeoutCycles);
 
         if (gp.altitude != 0)
         {
-            std::cout
-                << "Landing finished, but the aircraft is in an unexpected mode. "
-                   "Please connect DJI GO.\n";
+            std::cout << "Landing finished, but the aircraft is in an unexpected mode. Please connect DJI GO.\n";
             return false;
         }
         else
@@ -885,9 +859,7 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
         ACK::ErrorCode ack = vehicle->subscribe->removePackage(pkgIndex, timeout);
         if (ACK::getError(ack))
         {
-            std::cout
-                << "Error unsubscribing; please restart the drone/FC to get back "
-                   "to a clean state.\n";
+            std::cout << "Error unsubscribing; please restart the drone/FC to get back to a clean state.\n";
         }
     }
 

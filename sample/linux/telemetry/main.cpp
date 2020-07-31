@@ -50,19 +50,19 @@ void commandAction(Vehicle* vehicle) {
 	// 	ACTION_EVENT &= ~TAKEOFF;
 	// }
 	//else 
-	if(ACTION_EVENT & LAND) {
+	// if(ACTION_EVENT & LAND) {
 		
-		std::cout << "\r\nLAND\r\n";
+	// 	std::cout << "\r\nLAND\r\n";
 		
-		inProcessing = 1;
+	// 	inProcessing = 1;
 		
-		//vehicle->obtainCtrlAuthority(functionTimeout);
+	// 	//vehicle->obtainCtrlAuthority(functionTimeout);
 
-		monitoredLanding(vehicle);
+	// 	monitoredLanding(vehicle);
 		
-		inProcessing = 0;
-		ACTION_EVENT &= ~LAND;
-	}
+	// 	inProcessing = 0;
+	// 	ACTION_EVENT &= ~LAND;
+	// }
 	else if(ACTION_EVENT & MOVE) {
 		
 		printf("\r\nMOVE\r\n");
@@ -182,9 +182,33 @@ void *action_takeoff(void *arg)
 			
 			inProcessing = 1;
 			
-			//vehicle->obtainCtrlAuthority(functionTimeout);
-			
 			monitoredTakeoff(vehicle);
+			
+			inProcessing = 0;
+		}
+	}
+}
+
+void *action_land(void *arg)
+{
+	int sockfd;
+	Vehicle* vehicle;
+	int readn, writen;
+	char buf[256];
+	Data* d  = (Data*)arg;
+	sockfd = d->s;
+	vehicle = d->v;
+
+	while (1)
+	{
+		if(ACTION_EVENT & LAND) {
+			ACTION_EVENT &= ~LAND;
+		
+			std::cout << "\r\nLAND\r\n";
+			
+			inProcessing = 1;
+			
+			monitoredLanding(vehicle);
 			
 			inProcessing = 0;
 		}
@@ -240,8 +264,8 @@ int main(int argc, char *argv[])
 	int sockfd, portno, n;
 	struct sockaddr_in serv_addr;
 	struct hostent *server;
-	pthread_t thread_t, thread_t2, thread_takeoff, thread_waypoint;
-	int th_id, th_id2, th_id_takeoff, , th_id_waypoint;
+	pthread_t thread_broadcast_data, thread_t2, thread_takeoff, thread_land, thread_waypoint;
+	int th_id_broadcast_data, th_id2, th_id_takeoff, th_id_land, th_id_waypoint;
 	char buffer[256];
 	int time = 0;
 
@@ -264,15 +288,6 @@ int main(int argc, char *argv[])
 	d.v = vehicle;
 	d.s = sockfd;
 
-
-	th_id = pthread_create(&thread_t, NULL, action_broadcast_data, (void *)&d);
-	if (th_id != 0)
-	{
-		perror("Thread Create Error");
-		return 1;
-	}
-	pthread_detach(thread_t);
-	
 	th_id2 = pthread_create(&thread_t2, NULL, event_handler, (void *)&d);
 	if (th_id2 != 0)
 	{
@@ -281,6 +296,14 @@ int main(int argc, char *argv[])
 	}
 	pthread_detach(thread_t2);
 
+	th_id_broadcast_data = pthread_create(&thread_broadcast_data, NULL, action_broadcast_data, (void *)&d);
+	if (th_id_broadcast_data != 0)
+	{
+		perror("Thread of broadcast data Create Error");
+		return 1;
+	}
+	pthread_detach(thread_broadcast_data);
+	
 	th_id_takeoff = pthread_create(&thread_takeoff, NULL, action_takeoff, (void *)&d);
 	if (th_id_takeoff != 0)
 	{
@@ -288,6 +311,14 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	pthread_detach(thread_takeoff);
+
+	th_id_land = pthread_create(&thread_land, NULL, action_land, (void *)&d);
+	if (th_id_land != 0)
+	{
+		perror("Thread of land Create Error");
+		return 1;
+	}
+	pthread_detach(thread_land);
 
 	th_id_waypoint = pthread_create(&thread_waypoint, NULL, action_waypoint, (void *)&d);
 	if (th_id_waypoint != 0)
