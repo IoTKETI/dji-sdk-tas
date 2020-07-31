@@ -63,7 +63,8 @@ void commandAction(Vehicle* vehicle) {
 	// 	inProcessing = 0;
 	// 	ACTION_EVENT &= ~LAND;
 	// }
-	else if(ACTION_EVENT & MOVE) {
+	// else 
+	if(ACTION_EVENT & MOVE) {
 		
 		printf("\r\nMOVE\r\n");
 		
