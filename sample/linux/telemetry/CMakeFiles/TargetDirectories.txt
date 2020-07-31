@@ -1,0 +1,3 @@
+/home/nvidia/Downloads/Onboard-SDK-3.4.0/sample/linux/telemetry/CMakeFiles/rebuild_cache.dir
+/home/nvidia/Downloads/Onboard-SDK-3.4.0/sample/linux/telemetry/CMakeFiles/edit_cache.dir
+/home/nvidia/Downloads/Onboard-SDK-3.4.0/sample/linux/telemetry/CMakeFiles/djiosdk-Mobius.dir
