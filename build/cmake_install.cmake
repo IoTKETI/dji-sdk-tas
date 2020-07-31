@@ -1,4 +1,4 @@
-# Install script for directory: /home/pi/2Onboard-SDK/Onboard-SDK
+# Install script for directory: /home/pi/dji-sdk-tas
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -32,10 +32,15 @@ if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
   set(CMAKE_INSTALL_SO_NO_EXE "1")
 endif()
 
+# Is this installation the result of a crosscompile?
+if(NOT DEFINED CMAKE_CROSSCOMPILING)
+  set(CMAKE_CROSSCOMPILING "FALSE")
+endif()
+
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/pi/2Onboard-SDK/Onboard-SDK/build/osdk-core/cmake_install.cmake")
-  include("/home/pi/2Onboard-SDK/Onboard-SDK/build/sample/linux/cmake_install.cmake")
+  include("/home/pi/dji-sdk-tas/build/osdk-core/cmake_install.cmake")
+  include("/home/pi/dji-sdk-tas/build/sample/linux/cmake_install.cmake")
 
 endif()
 
@@ -47,5 +52,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/pi/2Onboard-SDK/Onboard-SDK/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/pi/dji-sdk-tas/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
