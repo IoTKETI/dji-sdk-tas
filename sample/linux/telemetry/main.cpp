@@ -131,7 +131,7 @@ void error(const char *msg)
 	exit(0);
 }
 
-void *myFunc(void *arg)
+void *action_broadcast_data(void *arg)
 {
 	int sockfd;
 	Vehicle* vehicle;
@@ -147,7 +147,7 @@ void *myFunc(void *arg)
 	}
 }
 
-void *myFunc2(void *arg)
+void *event_handler(void *arg)
 {
 	int sockfd;
 	Vehicle* vehicle;
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
 	d.s = sockfd;
 
 
-	th_id = pthread_create(&thread_t, NULL, myFunc, (void *)&d);
+	th_id = pthread_create(&thread_t, NULL, action_broadcast_data, (void *)&d);
 	if (th_id != 0)
 	{
 		perror("Thread Create Error");
@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
 	}
 	pthread_detach(thread_t);
 	
-	th_id2 = pthread_create(&thread_t2, NULL, myFunc2, (void *)&d);
+	th_id2 = pthread_create(&thread_t2, NULL, event_handler, (void *)&d);
 	if (th_id2 != 0)
 	{
 		perror("Thread Create 2 Error");
