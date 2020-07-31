@@ -43,6 +43,8 @@ float_t cur_velx = 0.0;
 float_t cur_vely = 0.0;
 float_t cur_velz = 0.0;
 
+extern float32_t g_cur_alt;
+
 //string  data;
 
 uint8_t mav_gp[512];
@@ -108,6 +110,8 @@ bool getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sock
 			velocity       = vehicle->broadcast->getVelocity();
 			quaternion     = vehicle->broadcast->getQuaternion();
 			battery		   = vehicle->broadcast->getBatteryInfo();
+
+			g_cur_alt = globalPosition.height;
 
 			string  data;
 			data = "[";
