@@ -61,8 +61,7 @@ unsigned short crc_16(const unsigned char* data_p, unsigned char length){
     return crc;
 }
 
-bool
-getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sockfd)
+bool getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sockfd)
 {
 	// Counters
 	int elapsedTimeInMs = 0;
@@ -75,8 +74,7 @@ getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sockfd)
 	// 4. Velocity
 	// 5. Quaternion
 
-	// Please make sure your drone is in simulation mode. You can
-	// fly the drone with your RC to get different values.
+	// Please make sure your drone is in simulation mode. You can fly the drone with your RC to get different values.
 	Telemetry::TimeStamp      timestamp;
 	Telemetry::Status         status;
 	Telemetry::GlobalPosition globalPosition;
@@ -90,9 +88,8 @@ getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sockfd)
 	ACK::ErrorCode ack = vehicle->broadcast->setBroadcastFreqDefaults(TIMEOUT);
 
   // Print in a loop for 2 seconds
-	while ( tt >= timeToPrintInMs)
+	while (elapsedTimeInMs < timeToPrintInMs)
 	{
-		//std::cout << "======================Send DATA ==============================\n";
 		// Matrice 100 broadcasts only flight status
 		timestamp      = vehicle->broadcast->getTimeStamp();
 		status         = vehicle->broadcast->getStatus();
@@ -101,111 +98,6 @@ getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sockfd)
 		velocity       = vehicle->broadcast->getVelocity();
 		quaternion     = vehicle->broadcast->getQuaternion();
 		battery		   = vehicle->broadcast->getBatteryInfo();
-
-	//	bzero(buffer, 256);
-	//	buffer += (unsigned)status.flight;
-	//	buffer +=  "\n";
-	//        buffer +=  globalPosition.latitude ;
-	//        buffer +=  ", " ;
-	//        buffer +=  globalPosition.longitude + ", " + globalPosition.altitude + "\n"+
-	//    rc.roll + ", " + rc.pitch + ", " + rc.yaw + ", " + rc.throttle + "\n" +
-	//    velocity.x + ", " + velocity.y + ", " + velocity.z + "\n" +
-	//    quaternion.q0 + ", " + quaternion.q1 + ", " + quaternion.q2  + ", " + quaternion.q3 + "\n";
-
-		
-	   // int abc = (unsigned)status.flight;
-	//    std::cout << abc << "\n";
-
-
-	//  string data[2];
-	//  data[0] = to_string(globalPosition.latitude);
-	//  data[1] = to_string(globalPosition.longitude);
-		/*
-		cur_lati = ((globalPosition.latitude)*57.295779513082320876798154814)*100000000;
-		cur_longi = ((globalPosition.longitude)*57.295779513082320876798154814)*10000000;	
-		cur_alt = (globalPosition.altitude)*1000;
-		cur_height = (globalPosition.height)*1000;
-		cur_velx = (velocity.x)*100;
-		cur_vely = (velocity.y)*100;
-		cur_velz = (velocity.z)*100;
-		
-		// mav version 1
-		// Global Position
-		uint16_t idx = 0;
-		static uint8_t seq = 0;
-		mav_gp[idx++] = 0xfe;
-	  	mav_gp[idx++] = 28; // length
-		mav_gp[idx++] = seq++; // seq
-		mav_gp[idx++] = 0x65; // sys_id
-	  	mav_gp[idx++] = 0x01; // comp_id
-		mav_gp[idx++] = 0x21; // msg_id
-		
-		printf("data : %f,\t%f,\t%f,\t%f\n%f,\t%f,\t%f,\t\r\n", cur_lati, cur_longi, cur_alt, cur_height, cur_velx, cur_vely, cur_velz);
-		std::cout << "Position              (LLAH)           = "
-			<< (globalPosition.latitude*57.295779513082320876798154814) << ", " << (globalPosition.longitude*57.295779513082320876798154814)
-				  << ", " << globalPosition.altitude << ", " << globalPosition.height << "\n";
-		std::cout << "Velocity              (vx,vy,vz)      = " << velocity.x
-				  << ", " << velocity.y << ", " << velocity.z << "\n";
-		
-		// payload
-		memcpy(&mav_gp[idx], (uint8_t *)&timestamp.time_ms, 4);
-		idx += 4;
-		memcpy(&mav_gp[idx], (uint8_t *)&cur_lati, 4);
-		idx += 4;
-		memcpy(&mav_gp[idx], (uint8_t *)&cur_longi, 4);
-		idx += 4;
-		memcpy(&mav_gp[idx], (uint8_t *)&cur_alt, 4);
-		idx += 4;
-		memcpy(&mav_gp[idx], (uint8_t *)&cur_height, 4);
-		idx += 4;
-		memcpy(&mav_gp[idx], (uint8_t *)&cur_velx, 2);
-		idx += 2;
-		memcpy(&mav_gp[idx], (uint8_t *)&cur_vely, 2);
-		idx += 2;
-		memcpy(&mav_gp[idx], (uint8_t *)&cur_velz, 2);
-		idx += 2;
-
-		mav_gp[idx++] = 0x00; // heading low
-		mav_gp[idx++] = 0x00; // heading high
-
-		unsigned short crc16_val = 0;
-		crc16_val = crc_16(&mav_gp[1], idx-1);
-
-		mav_gp[idx++] = (uint8_t) ((crc16_val & 0xff00) >> 8);
-		mav_gp[idx++] = (uint8_t) ((crc16_val & 0x00ff));
-		
-		send(sockfd, mav_gp, idx, MSG_DONTWAIT);
-		
-		// HeartBeat
-		uint16_t idx_2 = 0;
-		static uint8_t seq_2 = 0;
-		mav_heartbeat[idx_2++] = 0xfe;
-	  	mav_heartbeat[idx_2++] = 9; // length
-		mav_heartbeat[idx_2++] = seq++; // seq
-		mav_heartbeat[idx_2++] = 0x65; // sys_id
-	  	mav_heartbeat[idx_2++] = 0x01; // comp_id
-		mav_heartbeat[idx_2++] = 0x00; // msg_id
-		
-		// payload
-		mav_heartbeat[idx_2++] = 0x00; 
-		mav_heartbeat[idx_2++] = 0x00; 
-		mav_heartbeat[idx_2++] = 0x00; 
-		mav_heartbeat[idx_2++] = 0x00; 
-		mav_heartbeat[idx_2++] = 0x02; 
-		mav_heartbeat[idx_2++] = 0x03; 
-		mav_heartbeat[idx_2++] = 0xd1; 
-		mav_heartbeat[idx_2++] = 0x03; 
-		mav_heartbeat[idx_2++] = 0x03; 
-		
-		unsigned short crc16_val_2 = 0;
-		crc16_val_2 = crc_16(&mav_heartbeat[1], idx_2-1);
-
-		mav_heartbeat[idx_2++] = (uint8_t) ((crc16_val_2 & 0xff00) >> 8);
-		mav_heartbeat[idx_2++] = (uint8_t) ((crc16_val_2 & 0x00ff));
-		
-		send(sockfd, mav_heartbeat, idx_2, MSG_DONTWAIT);
-*/
-//#if 0
 
 		string  data;
 		data = "[";
@@ -254,40 +146,6 @@ getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sockfd)
 		buffer = (char*)malloc(strlen(data.c_str())+1);
 		strcpy(buffer,data.c_str());
 
-	//	std::cout <<  buffer << "\n";
-	//	data += to_string(globalPosition.latitude);
-	//	data += to_string(globalPosition.longitude);
-	//	data += to_string(globalPosition.altitude);
-	//	data += to_string(rc.roll);
-		/*
-		data[5] = to_string(rc.pitch);
-		data[6] = to_string(rc.yaw);
-		data[7] = to_string(rc.throttle);
-		data[8] = to_string(velocity.x);
-		data[9] = to_string(velocity.y);
-		data[10] = to_string(velocity.z);
-		data[11] = to_string(quaternion.q0);
-		data[12] = to_string(quaternion.q1);
-		data[13] = to_string(quaternion.q2);
-		data[14] = to_string(quaternion.q3);
-
-	*/
-
-	/*
-		string str = to_string((unsigned)status.flight);
-		std::cout << str << ":\n";
-		string str1 = to_string(globalPosition.latitude);
-		std::cout << str1 << ":\n";
-		string str2 = to_string(globalPosition.altitude);
-		std::cout << str2 << ":\n";
-		string str3 = to_string(velocity.z);
-		std::cout << str3 << ":\n";
-		string str4 = to_string(quaternion.q0);
-		std::cout << str4 << ":\n";
-	*/
-
-		//std::cout << buffer << "\n";
-
 		send(sockfd, buffer, strlen(buffer), MSG_DONTWAIT);
 		free(buffer);
 
@@ -326,6 +184,272 @@ getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sockfd)
 //  std::cout << "Done printing!\n";
 	return true;
 }
+
+
+// bool getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sockfd)
+// {
+// 	// Counters
+// 	int elapsedTimeInMs = 0;
+// 	int timeToPrintInMs = 125;
+
+// 	// We will listen to five broadcast data sets:
+// 	// 1. Flight Status
+// 	// 2. Global Position
+// 	// 3. RC Channels
+// 	// 4. Velocity
+// 	// 5. Quaternion
+
+// 	// Please make sure your drone is in simulation mode. You can
+// 	// fly the drone with your RC to get different values.
+// 	Telemetry::TimeStamp      timestamp;
+// 	Telemetry::Status         status;
+// 	Telemetry::GlobalPosition globalPosition;
+// 	Telemetry::RC             rc;
+// 	Telemetry::Vector3f       velocity;
+// 	Telemetry::Quaternion     quaternion;
+// 	Telemetry::Battery        battery;
+// 	const int TIMEOUT = 20;
+
+// 	// Re-set Broadcast frequencies to their default values
+// 	ACK::ErrorCode ack = vehicle->broadcast->setBroadcastFreqDefaults(TIMEOUT);
+
+//   // Print in a loop for 2 seconds
+// 	while ( tt >= timeToPrintInMs)
+// 	{
+// 		//std::cout << "======================Send DATA ==============================\n";
+// 		// Matrice 100 broadcasts only flight status
+// 		timestamp      = vehicle->broadcast->getTimeStamp();
+// 		status         = vehicle->broadcast->getStatus();
+// 		globalPosition = vehicle->broadcast->getGlobalPosition();
+// 		rc             = vehicle->broadcast->getRC();
+// 		velocity       = vehicle->broadcast->getVelocity();
+// 		quaternion     = vehicle->broadcast->getQuaternion();
+// 		battery		   = vehicle->broadcast->getBatteryInfo();
+
+// 	//	bzero(buffer, 256);
+// 	//	buffer += (unsigned)status.flight;
+// 	//	buffer +=  "\n";
+// 	//        buffer +=  globalPosition.latitude ;
+// 	//        buffer +=  ", " ;
+// 	//        buffer +=  globalPosition.longitude + ", " + globalPosition.altitude + "\n"+
+// 	//    rc.roll + ", " + rc.pitch + ", " + rc.yaw + ", " + rc.throttle + "\n" +
+// 	//    velocity.x + ", " + velocity.y + ", " + velocity.z + "\n" +
+// 	//    quaternion.q0 + ", " + quaternion.q1 + ", " + quaternion.q2  + ", " + quaternion.q3 + "\n";
+
+		
+// 	   // int abc = (unsigned)status.flight;
+// 	//    std::cout << abc << "\n";
+
+
+// 	//  string data[2];
+// 	//  data[0] = to_string(globalPosition.latitude);
+// 	//  data[1] = to_string(globalPosition.longitude);
+// 		/*
+// 		cur_lati = ((globalPosition.latitude)*57.295779513082320876798154814)*100000000;
+// 		cur_longi = ((globalPosition.longitude)*57.295779513082320876798154814)*10000000;	
+// 		cur_alt = (globalPosition.altitude)*1000;
+// 		cur_height = (globalPosition.height)*1000;
+// 		cur_velx = (velocity.x)*100;
+// 		cur_vely = (velocity.y)*100;
+// 		cur_velz = (velocity.z)*100;
+		
+// 		// mav version 1
+// 		// Global Position
+// 		uint16_t idx = 0;
+// 		static uint8_t seq = 0;
+// 		mav_gp[idx++] = 0xfe;
+// 	  	mav_gp[idx++] = 28; // length
+// 		mav_gp[idx++] = seq++; // seq
+// 		mav_gp[idx++] = 0x65; // sys_id
+// 	  	mav_gp[idx++] = 0x01; // comp_id
+// 		mav_gp[idx++] = 0x21; // msg_id
+		
+// 		printf("data : %f,\t%f,\t%f,\t%f\n%f,\t%f,\t%f,\t\r\n", cur_lati, cur_longi, cur_alt, cur_height, cur_velx, cur_vely, cur_velz);
+// 		std::cout << "Position              (LLAH)           = "
+// 			<< (globalPosition.latitude*57.295779513082320876798154814) << ", " << (globalPosition.longitude*57.295779513082320876798154814)
+// 				  << ", " << globalPosition.altitude << ", " << globalPosition.height << "\n";
+// 		std::cout << "Velocity              (vx,vy,vz)      = " << velocity.x
+// 				  << ", " << velocity.y << ", " << velocity.z << "\n";
+		
+// 		// payload
+// 		memcpy(&mav_gp[idx], (uint8_t *)&timestamp.time_ms, 4);
+// 		idx += 4;
+// 		memcpy(&mav_gp[idx], (uint8_t *)&cur_lati, 4);
+// 		idx += 4;
+// 		memcpy(&mav_gp[idx], (uint8_t *)&cur_longi, 4);
+// 		idx += 4;
+// 		memcpy(&mav_gp[idx], (uint8_t *)&cur_alt, 4);
+// 		idx += 4;
+// 		memcpy(&mav_gp[idx], (uint8_t *)&cur_height, 4);
+// 		idx += 4;
+// 		memcpy(&mav_gp[idx], (uint8_t *)&cur_velx, 2);
+// 		idx += 2;
+// 		memcpy(&mav_gp[idx], (uint8_t *)&cur_vely, 2);
+// 		idx += 2;
+// 		memcpy(&mav_gp[idx], (uint8_t *)&cur_velz, 2);
+// 		idx += 2;
+
+// 		mav_gp[idx++] = 0x00; // heading low
+// 		mav_gp[idx++] = 0x00; // heading high
+
+// 		unsigned short crc16_val = 0;
+// 		crc16_val = crc_16(&mav_gp[1], idx-1);
+
+// 		mav_gp[idx++] = (uint8_t) ((crc16_val & 0xff00) >> 8);
+// 		mav_gp[idx++] = (uint8_t) ((crc16_val & 0x00ff));
+		
+// 		send(sockfd, mav_gp, idx, MSG_DONTWAIT);
+		
+// 		// HeartBeat
+// 		uint16_t idx_2 = 0;
+// 		static uint8_t seq_2 = 0;
+// 		mav_heartbeat[idx_2++] = 0xfe;
+// 	  	mav_heartbeat[idx_2++] = 9; // length
+// 		mav_heartbeat[idx_2++] = seq++; // seq
+// 		mav_heartbeat[idx_2++] = 0x65; // sys_id
+// 	  	mav_heartbeat[idx_2++] = 0x01; // comp_id
+// 		mav_heartbeat[idx_2++] = 0x00; // msg_id
+		
+// 		// payload
+// 		mav_heartbeat[idx_2++] = 0x00; 
+// 		mav_heartbeat[idx_2++] = 0x00; 
+// 		mav_heartbeat[idx_2++] = 0x00; 
+// 		mav_heartbeat[idx_2++] = 0x00; 
+// 		mav_heartbeat[idx_2++] = 0x02; 
+// 		mav_heartbeat[idx_2++] = 0x03; 
+// 		mav_heartbeat[idx_2++] = 0xd1; 
+// 		mav_heartbeat[idx_2++] = 0x03; 
+// 		mav_heartbeat[idx_2++] = 0x03; 
+		
+// 		unsigned short crc16_val_2 = 0;
+// 		crc16_val_2 = crc_16(&mav_heartbeat[1], idx_2-1);
+
+// 		mav_heartbeat[idx_2++] = (uint8_t) ((crc16_val_2 & 0xff00) >> 8);
+// 		mav_heartbeat[idx_2++] = (uint8_t) ((crc16_val_2 & 0x00ff));
+		
+// 		send(sockfd, mav_heartbeat, idx_2, MSG_DONTWAIT);
+// */
+// //#if 0
+
+// 		string  data;
+// 		data = "[";
+// 		data += to_string((unsigned)status.flight);
+// 		data += ",";
+// 		data += to_string(timestamp.time_ms);
+// 		data += ",";
+// 		cur_lati = globalPosition.latitude;
+// 		data += to_string((cur_lati*57.295779513082320876798154814));
+// 		data += ",";
+// 		cur_longi = globalPosition.longitude;
+// 		data += to_string((cur_longi*57.295779513082320876798154814));
+// 		data += ",";
+// 		data += to_string(globalPosition.altitude);
+// 		data += ",";
+// 		data += to_string(globalPosition.height);
+// 		data += ",";
+// 		data += to_string(rc.roll);
+// 		data += ",";
+// 		data += to_string(rc.pitch);
+// 		data += ",";
+// 		data += to_string(rc.yaw);
+// 		data += ",";
+// 		//data += to_string(rc.throttle);
+// 		//data += ",";
+// 		data += to_string(velocity.x);
+// 		data += ",";
+// 		data += to_string(velocity.y);
+// 		data += ",";
+// 		data += to_string(velocity.z);
+// 		//data += "\n";
+// 		data += ",";
+// 		data += to_string(battery.percentage);
+// 		data += "]";
+// 		// data += to_string(quaternion.q0);
+// 		// data += ",";
+// 		// data += to_string(quaternion.q1);
+// 		// data += ",";
+// 		// data += to_string(quaternion.q2);
+// 		// data += ",";
+// 		// data += to_string(quaternion.q3);
+	
+// 		//std::cout << data << "\n";
+
+// 		char *buffer = NULL;
+// 		buffer = (char*)malloc(strlen(data.c_str())+1);
+// 		strcpy(buffer,data.c_str());
+
+// 	//	std::cout <<  buffer << "\n";
+// 	//	data += to_string(globalPosition.latitude);
+// 	//	data += to_string(globalPosition.longitude);
+// 	//	data += to_string(globalPosition.altitude);
+// 	//	data += to_string(rc.roll);
+// 		/*
+// 		data[5] = to_string(rc.pitch);
+// 		data[6] = to_string(rc.yaw);
+// 		data[7] = to_string(rc.throttle);
+// 		data[8] = to_string(velocity.x);
+// 		data[9] = to_string(velocity.y);
+// 		data[10] = to_string(velocity.z);
+// 		data[11] = to_string(quaternion.q0);
+// 		data[12] = to_string(quaternion.q1);
+// 		data[13] = to_string(quaternion.q2);
+// 		data[14] = to_string(quaternion.q3);
+
+// 	*/
+
+// 	/*
+// 		string str = to_string((unsigned)status.flight);
+// 		std::cout << str << ":\n";
+// 		string str1 = to_string(globalPosition.latitude);
+// 		std::cout << str1 << ":\n";
+// 		string str2 = to_string(globalPosition.altitude);
+// 		std::cout << str2 << ":\n";
+// 		string str3 = to_string(velocity.z);
+// 		std::cout << str3 << ":\n";
+// 		string str4 = to_string(quaternion.q0);
+// 		std::cout << str4 << ":\n";
+// 	*/
+
+// 		//std::cout << buffer << "\n";
+
+// 		send(sockfd, buffer, strlen(buffer), MSG_DONTWAIT);
+// 		free(buffer);
+
+// 	    std::cout << "-----send ---------------------------------" << "\n";
+	
+// 	//    std::cout << "Counter = " << elapsedTimeInMs << ":\n";
+// 		//std::cout << "-------\n";
+// 		std::cout << "Flight Status                         = "
+// 				  << (unsigned)status.flight << "\n";
+// 		std::cout << "Time Stamp                            = "
+// 				  << (unsigned)timestamp.time_ms << "\n";
+// 		std::cout << "Position              (LLA)           = "
+// 			<< (globalPosition.latitude*57.295779513082320876798154814) << ", " << (globalPosition.longitude*57.295779513082320876798154814)
+// 				  << ", " << globalPosition.altitude << ", " << globalPosition.height << "\n";
+// 		std::cout << "RC Commands           (r/p/y/thr)     = " << rc.roll << ", "
+// 				  << rc.pitch << ", " << rc.yaw << ", " << rc.throttle << "\n";
+// 		std::cout << "Velocity              (vx,vy,vz)      = " << velocity.x
+// 				  << ", " << velocity.y << ", " << velocity.z << "\n";
+// 		std::cout << "Battery                               = "
+// 				  << (unsigned)battery.percentage << "\n";
+// 		//std::cout << "Attitude Quaternion   (w,x,y,z)       = " << quaternion.q0
+// 		//		  << ", " << quaternion.q1 << ", " << quaternion.q2 << ", "
+// 		//		 << quaternion.q3 << "\n";
+// 		//std::cout << "-------\n\n";
+	  	
+// //#endif
+// 	//    usleep(10000);
+// 		//    elapsedTimeInMs += 5;
+// 		tt = 0;
+// 	}
+	
+// 	tt += 10;   
+	
+	
+ 
+// //  std::cout << "Done printing!\n";
+// 	return true;
+// }
 /*
 bool
 getHeartBeat(int sockfd)
@@ -374,8 +498,7 @@ getHeartBeat(int sockfd)
 	return true;
 }
 */
-bool 
-subscribeToData(Vehicle* vehicle, int responseTimeout , int sockfd)
+bool subscribeToData(Vehicle* vehicle, int responseTimeout , int sockfd)
 {
 	// RTK can be detected as unavailable only for Flight controllers that don't support RTK
 	bool rtkAvailable = false;

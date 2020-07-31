@@ -89,19 +89,19 @@ void commandAction(Vehicle* vehicle) {
 		inProcessing = 0;
 		ACTION_EVENT &= ~ALT;
 	}
-	else if(ACTION_EVENT & WAYPOINT) {
+	// else if(ACTION_EVENT & WAYPOINT) {
 		
-		printf("\r\nWAYPOINT\r\n");
+	// 	printf("\r\nWAYPOINT\r\n");
 		
-		inProcessing = 1;
+	// 	inProcessing = 1;
 		
-		//vehicle->obtainCtrlAuthority(functionTimeout);
+	// 	//vehicle->obtainCtrlAuthority(functionTimeout);
 		
-		runWaypointMission(vehicle, g_numWaypoints, g_responseTimeout, g_lat, g_lon, g_alt);
+	// 	runWaypointMission(vehicle, g_numWaypoints, g_responseTimeout, g_lat, g_lon, g_alt);
 		
-		inProcessing = 0;
-		ACTION_EVENT &= ~WAYPOINT;
-	}
+	// 	inProcessing = 0;
+	// 	ACTION_EVENT &= ~WAYPOINT;
+	// }
 	else if(ACTION_EVENT & RTH) {
 		
 		printf("\r\nRTH\r\n");
@@ -191,6 +191,33 @@ void *action_takeoff(void *arg)
 	}
 }
 
+void *action_waypoint(void *arg)
+{
+	int sockfd;
+	Vehicle* vehicle;
+	int readn, writen;
+	char buf[256];
+	Data* d  = (Data*)arg;
+	sockfd = d->s;
+	vehicle = d->v;
+
+	while (1)
+	{
+		if(ACTION_EVENT & WAYPOINT) {
+			ACTION_EVENT &= ~WAYPOINT;
+
+			printf("\r\nWAYPOINT\r\n");
+			
+			inProcessing = 1;
+			
+			runWaypointMission(vehicle, g_numWaypoints, g_responseTimeout, g_lat, g_lon, g_alt);
+			
+			inProcessing = 0;
+		}
+	}
+}
+
+
 
 int main(int argc, char *argv[])
 {
@@ -213,8 +240,8 @@ int main(int argc, char *argv[])
 	int sockfd, portno, n;
 	struct sockaddr_in serv_addr;
 	struct hostent *server;
-	pthread_t thread_t, thread_t2, thread_takeoff;
-	int th_id, th_id2, th_id_takeoff;
+	pthread_t thread_t, thread_t2, thread_takeoff, thread_waypoint;
+	int th_id, th_id2, th_id_takeoff, , th_id_waypoint;
 	char buffer[256];
 	int time = 0;
 
@@ -226,9 +253,7 @@ int main(int argc, char *argv[])
 
 	bzero((char *)&serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
-	bcopy((char *)server->h_addr,
-		(char *)&serv_addr.sin_addr.s_addr,
-		server->h_length);
+	bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
 	serv_addr.sin_port = htons(portno);
 
 	if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
@@ -263,7 +288,15 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	pthread_detach(thread_takeoff);
-	
+
+	th_id_waypoint = pthread_create(&thread_waypoint, NULL, action_waypoint, (void *)&d);
+	if (th_id_waypoint != 0)
+	{
+		perror("Thread of waypoint Create Error");
+		return 1;
+	}
+	pthread_detach(thread_waypoint);
+
 	vehicle->obtainCtrlAuthority(functionTimeout);
 
 	while (1)
