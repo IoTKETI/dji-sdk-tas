@@ -458,7 +458,7 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
     // There is a deadband in position control
     // the z cmd is absolute height
     // while x and y are in relative
-    float zDeadband = 0.12;
+    float zDeadband = 0.22;
 
     if (vehicle->isM100() || vehicle->isLegacyM600())
     {

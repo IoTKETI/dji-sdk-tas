@@ -122,7 +122,7 @@ bool runWaypointMission(Vehicle *vehicle, uint8_t numWaypoints, int responseTime
     fdata.indexNumber = numWaypoints + 1; // We add 1 to get the aircarft back to the start.
 
     float64_t increment = 0.000001;
-    float32_t start_alt = 0;
+    float32_t start_alt = 10;
 
     ACK::ErrorCode initAck = vehicle->missionManager->init(DJI_MISSION_TYPE::WAYPOINT, responseTimeout, &fdata);
     if (ACK::getError(initAck))
@@ -184,8 +184,8 @@ void setWaypointDefaults(WayPointSettings *wp)
 
 void setWaypointInitDefaults(WayPointInitSettings *fdata)
 {
-    fdata->maxVelocity = 10;
-    fdata->idleVelocity = 5;
+    fdata->maxVelocity = 5;
+    fdata->idleVelocity = 2;
     fdata->finishAction = 0;
     fdata->executiveTimes = 1;
     fdata->yawMode = 0;

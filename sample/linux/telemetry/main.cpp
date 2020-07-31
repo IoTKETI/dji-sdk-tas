@@ -261,7 +261,7 @@ void *action_waypoint(void *arg)
 			
 			inProcessing = 1;
 			
-			runWaypointMission(vehicle, g_numWaypoints, g_responseTimeout, g_lat, g_lon, g_alt);
+			runWaypointMission(vehicle, 1, g_responseTimeout, g_lat, g_lon, g_alt);
 			
 			inProcessing = 0;
 		}
@@ -407,7 +407,7 @@ int main(int argc, char *argv[])
 			
 			if(inProcessing == 1) {
 				printf("\r\nDrone is IN PROCESSING\r\n");
-				//memset(buffer, 0, sizeof(char)* 256);
+				memset(buffer, 0, sizeof(char)* 256);
 			}
 			else {
 				//printf("Data : %s\n", buffer);
@@ -471,7 +471,7 @@ int main(int argc, char *argv[])
 				case 'g':
 					printf("g command = original data : %f, %f, %f\r\n", strtof(str[1].c_str(), 0), strtof(str[2].c_str(), 0), strtof(str[3].c_str(), 0));
 						
-					g_numWaypoints = num_way;
+					g_numWaypoints = 1;
 					g_responseTimeout = responseTimeout;
 					g_lat = (strtof(str[1].c_str(), 0)/57.295779513082320876798154814);
 					g_lon = (strtof(str[2].c_str(), 0)/57.295779513082320876798154814);
@@ -490,7 +490,7 @@ int main(int argc, char *argv[])
 					break;
 				}
 					
-				//memset(buffer, 0, sizeof(char)* 256);
+				memset(buffer, 0, sizeof(char)* 256);
 			}
 		}
 		
