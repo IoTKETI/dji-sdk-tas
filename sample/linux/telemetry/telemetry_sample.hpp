@@ -141,6 +141,5 @@ bool
 monitoredGoHome(DJI::OSDK::Vehicle* vehiclePtr, int timeout = 1);
 
 
-
 #endif // DJIOSDK_TELEMETRYSAMPLE_HPP
 
