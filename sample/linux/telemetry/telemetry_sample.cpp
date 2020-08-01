@@ -44,6 +44,7 @@ float_t cur_vely = 0.0;
 float_t cur_velz = 0.0;
 
 extern float32_t g_cur_alt;
+extern float32_t g_cur_height;
 
 //string  data;
 
@@ -111,11 +112,24 @@ bool getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sock
 			quaternion     = vehicle->broadcast->getQuaternion();
 			battery		   = vehicle->broadcast->getBatteryInfo();
 
-			g_cur_alt = globalPosition.height;
+			g_cur_alt = globalPosition.altitude;
+			g_cur_height = globalPosition.height;
 
 			string  data;
 			data = "[";
-			data += to_string((unsigned)status.flight);
+
+			if (vehicle->isM100()) {
+				if(((unsigned)status.flight == 1) || ((unsigned)status.flight == 5)) {
+					data += "0";
+				}
+				else {
+					data += to_string((unsigned)status.flight);
+				}
+			}
+			else {
+				data += to_string((unsigned)status.flight);
+			}
+			
 			data += ",";
 			data += to_string(timestamp.time_ms);
 			data += ",";

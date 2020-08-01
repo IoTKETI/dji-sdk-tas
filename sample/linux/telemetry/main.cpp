@@ -31,6 +31,7 @@ float32_t g_lon = 0.0;
 float32_t g_alt = 0.0;
 
 float32_t g_cur_alt = 0.0;
+float32_t g_cur_height = 0.0;
 
 int inProcessing = 0;
                      
@@ -296,6 +297,9 @@ void *action_alt(void *arg)
 	}
 }
 
+unsigned long in_processing_watchdog_count = 0;
+const unsigned long MAX_WAITING_COUNT = 30000 * 15;
+
 int main(int argc, char *argv[])
 {
 	// Setup OSDK.
@@ -403,6 +407,14 @@ int main(int argc, char *argv[])
 
 	while (1)
 	{
+		if(inProcessing == 1) {
+			in_processing_watchdog_count++;
+			if(in_processing_watchdog_count >= MAX_WAITING_COUNT) {
+				inProcessing = 0;
+				in_processing_watchdog_count = 0;
+			}
+		}
+
 		if (recv(sockfd, buffer, 255, MSG_DONTWAIT) != -1)
 		{
 			//printf("Data : %s\n", buffer);
@@ -464,8 +476,8 @@ int main(int argc, char *argv[])
 					g_yoffd = 0.0;
 					g_zoffd = strtof(str[1].c_str(), 0) - g_cur_alt;
 					g_yawd = 0.0;
-					g_pth = 0.01;
-					g_yawth = 0.01;
+					g_pth = 0.2;
+					g_yawth = 1.0;
 					
 					ACTION_EVENT |= ALT;
 					break;
@@ -480,7 +492,7 @@ int main(int argc, char *argv[])
 					g_alt = strtof(str[3].c_str(), 0);
 
 					if(g_alt == 0.0) {
-						g_alt = g_cur_alt;
+						g_alt = g_cur_height;
 					}
 					
 					printf("g command = g_lat, g_lon, g_alt: %f, %f, %f\r\n", g_lat, g_lon, g_alt);

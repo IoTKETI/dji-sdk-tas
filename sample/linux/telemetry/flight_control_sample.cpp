@@ -338,18 +338,15 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
     setpoints and use attitude control or convert to velocity setpoints
     and use velocity control.
 !*/
-bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
-                          float yOffsetDesired, float zOffsetDesired,
-                          float yawDesired, float posThresholdInM,
-                          float yawThresholdInDeg)
+bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetDesired, float zOffsetDesired, float yawDesired, float posThresholdInM, float yawThresholdInDeg)
 {
     // Set timeout: this timeout is the time you allow the drone to take to finish
     // the
     // mission
     int responseTimeout = 1;
-    int timeoutInMilSec = 100000;
+    int timeoutInMilSec = 100000; // 100000 msec
     int controlFreqInHz = 50; // Hz
-    int cycleTimeInMs = 1000 / controlFreqInHz;
+    int cycleTimeInMs = 1000 / controlFreqInHz; // 20 msec
     int outOfControlBoundsTimeLimit = 10 * cycleTimeInMs;  // 10 cycles
     int withinControlBoundsTimeReqmt = 50 * cycleTimeInMs; // 50 cycles
     int pkgIndex;
@@ -640,8 +637,7 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired,
             ACK::ErrorCode ack = vehicle->subscribe->removePackage(pkgIndex, responseTimeout);
             if (ACK::getError(ack))
             {
-                std::cout << "Error unsubscribing; please restart the drone/FC to get "
-                             "back to a clean state.\n";
+                std::cout << "Error unsubscribing; please restart the drone/FC to get back to a clean state.\n";
             }
         }
         return ACK::FAIL;
@@ -893,8 +889,7 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
 /coordinates.
     Accurate when distances are small.
 !*/
-void localOffsetFromGpsOffset(Vehicle *vehicle, Telemetry::Vector3f &deltaNed,
-                              void *target, void *origin)
+void localOffsetFromGpsOffset(Vehicle *vehicle, Telemetry::Vector3f &deltaNed, void *target, void *origin)
 {
     Telemetry::GPSFused *subscriptionTarget;
     Telemetry::GPSFused *subscriptionOrigin;
