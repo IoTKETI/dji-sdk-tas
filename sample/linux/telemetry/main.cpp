@@ -414,6 +414,9 @@ int main(int argc, char *argv[])
 				in_processing_watchdog_count = 0;
 			}
 		}
+		else if(inProcessing == 0) {
+			in_processing_watchdog_count = 0;
+		}
 
 		if (recv(sockfd, buffer, 255, MSG_DONTWAIT) != -1)
 		{
