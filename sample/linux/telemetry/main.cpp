@@ -298,7 +298,7 @@ void *action_alt(void *arg)
 }
 
 unsigned long in_processing_watchdog_count = 0;
-const unsigned long MAX_WAITING_COUNT = 30000 * 15;
+const unsigned long MAX_WAITING_COUNT = 30000 * 1000 * 12;
 
 int main(int argc, char *argv[])
 {
