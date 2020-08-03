@@ -477,7 +477,7 @@ int main(int argc, char *argv[])
 				case 'a':
 					g_xoffd = 0.0; 
 					g_yoffd = 0.0;
-					g_zoffd = strtof(str[1].c_str(), 0) - g_cur_alt;
+					g_zoffd = strtof(str[1].c_str(), 0) - g_cur_height;
 					g_yawd = 0.0;
 					g_pth = 0.2;
 					g_yawth = 1.0;
