@@ -32,7 +32,9 @@ float32_t g_alt = 0.0;
 
 float32_t g_cur_alt = 0.0;
 float32_t g_cur_height = 0.0;
-float32_t g_idle_velocity = 3.5;
+
+const float32_t default_idle_velocity = 3.5;
+float32_t g_idle_velocity = default_idle_velocity;
 
 int inProcessing = 0;
                      
@@ -495,9 +497,14 @@ int main(int argc, char *argv[])
 					g_lat = (strtof(str[1].c_str(), 0)/57.295779513082320876798154814);
 					g_lon = (strtof(str[2].c_str(), 0)/57.295779513082320876798154814);
 					g_alt = strtof(str[3].c_str(), 0);
+					g_idle_velocity = strtof(str[1].c_str(), 0);
 
 					if(g_alt == 0.0) {
 						g_alt = g_cur_height;
+					}
+
+					if(g_alt == 0.0) {
+						g_idle_velocity = default_idle_velocity;
 					}
 					
 					printf("g command = g_lat, g_lon, g_alt: %f, %f, %f\r\n", g_lat, g_lon, g_alt);
@@ -507,10 +514,6 @@ int main(int argc, char *argv[])
 
 				case 'h':
 					ACTION_EVENT |= RTH;
-					break;
-
-				case 'v':
-					g_idle_velocity = strtof(str[1].c_str(), 0);
 					break;
 
 				default:
