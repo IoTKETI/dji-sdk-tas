@@ -308,6 +308,8 @@ int main(int argc, char *argv[])
 	// Setup OSDK.
 	Data d;
 
+	Telemetry::GlobalPosition currentHeight;
+
 	int functionTimeout = 1;
 
 	int     responseTimeout = 1;
@@ -478,10 +480,12 @@ int main(int argc, char *argv[])
 					break;
 					
 				case 'a':
+					currentHeight = vehicle->broadcast->getGlobalPosition();					
 					g_xoffd = 0.0; 
 					g_yoffd = 0.0;
 					//g_zoffd = strtof(str[1].c_str(), 0) - g_cur_height;
-					g_zoffd = strtof(str[1].c_str(), 0) - g_cur_alt;
+					//g_zoffd = strtof(str[1].c_str(), 0) - g_cur_alt;
+					g_zoffd = strtof(str[1].c_str(), 0) - currentHeight.altitude;
 					g_yawd = 0.0;
 					g_pth = 0.2;
 					g_yawth = 1.0;
@@ -490,6 +494,7 @@ int main(int argc, char *argv[])
 					break;
 
 				case 'g':
+					currentHeight = vehicle->broadcast->getGlobalPosition();
 					printf("g command = original data : %f, %f, %f\r\n", strtof(str[1].c_str(), 0), strtof(str[2].c_str(), 0), strtof(str[3].c_str(), 0));
 						
 					g_numWaypoints = 1;
@@ -497,10 +502,11 @@ int main(int argc, char *argv[])
 					g_lat = (strtof(str[1].c_str(), 0)/57.295779513082320876798154814);
 					g_lon = (strtof(str[2].c_str(), 0)/57.295779513082320876798154814);
 					g_alt = strtof(str[3].c_str(), 0);
-					g_idle_velocity = strtof(str[1].c_str(), 0);
+					g_idle_velocity = strtof(str[4].c_str(), 0);
 
 					if(g_alt == 0.0) {
-						g_alt = g_cur_height;
+						//g_alt = g_cur_height;
+						g_alt = currentHeight.altitude;
 					}
 
 					if(g_alt == 0.0) {

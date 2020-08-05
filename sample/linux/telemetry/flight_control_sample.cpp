@@ -123,8 +123,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
         {
             motorsNotStarted++;
             //usleep(10000);
-            flight_delay_loop_ms(10);
-            printf("FFFFF- %ld", loop_count);
+            flight_delay_loop_ms(100);
+            printf("FFFFF- %ld\n", loop_count);
         }
 
         if (motorsNotStarted < timeoutCycles)
@@ -146,7 +146,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
             //loop_count = 0;
             //break;
             //}
-            printf("HHHHH- %ld", loop_count);
+            printf("HHHHH- %ld\n", loop_count);
         }
 
         if (motorsNotStarted < timeoutCycles)
@@ -175,7 +175,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
             //loop_count = 0;
             //break;
             //}
-            printf("IIIII- %ld", loop_count);
+            printf("IIIII- %ld\n", loop_count);
         }
 
         if (stillOnGround >= timeoutCycles)
@@ -208,12 +208,12 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
             //loop_count = 0;
             //break;
             //}
-            printf("JJJJJ- %ld", loop_count);
+            printf("JJJJJ- %ld\n", loop_count);
         }
 
         if (stillOnGround < timeoutCycles)
         {
-            std::cout << "Aircraft in air!" << std::endl;
+            std::cout << "Aircraft in air!\n" << std::endl;
         }
     }
     else // M100
@@ -231,7 +231,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
             //loop_count = 0;
             //break;
             //}
-            printf("KKKKK- %ld", loop_count);
+            printf("KKKKK- %ld\n", loop_count);
         }
 
         if (stillOnGround < timeoutCycles)
@@ -252,7 +252,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
             //usleep(10000);
             flight_delay_loop_ms(100);
             loop_count++;
-            printf("LLLLL- %ld", loop_count);
+            printf("LLLLL- %ld\n", loop_count);
         }
 
         if (loop_count >= timeoutCycles)
@@ -292,7 +292,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
         Telemetry::GlobalPosition currentHeight;
         Telemetry::GlobalPosition deltaHeight = vehicle->broadcast->getGlobalPosition();
 
-        timeoutCycles = 10;
+        timeoutCycles = 100;
         loop_count = 0;
         do
         {
@@ -303,13 +303,13 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
             deltaHeight.altitude = currentHeight.altitude;
 
             loop_count++;
-            printf("MMMMM- %ld", loop_count);
+            printf("MMMMM- %ld\n", loop_count);
 
         } while (delta >= 0.009 && loop_count < timeoutCycles);
 
         if (loop_count >= timeoutCycles)
         {
-            std::cout << "Takeoff failed. The aircraft has not reached the target altitude." << std::endl;
+            std::cout << "Takeoff failed. The aircraft has not reached the target altitude.\n" << std::endl;
         }
         else
         {
