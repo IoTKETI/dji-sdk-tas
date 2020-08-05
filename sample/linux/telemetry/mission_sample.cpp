@@ -35,6 +35,8 @@
 using namespace DJI::OSDK;
 using namespace DJI::OSDK::Telemetry;
 
+extern float32_t g_idle_velocity;
+
 void mission_delay_loop_ms(unsigned int timeout_ms) {
 	unsigned long timeout_count = (timeout_ms * 30000);
 	unsigned long i= 0;
@@ -185,7 +187,7 @@ void setWaypointDefaults(WayPointSettings *wp)
 void setWaypointInitDefaults(WayPointInitSettings *fdata)
 {
     fdata->maxVelocity = 5;
-    fdata->idleVelocity = 2;
+    fdata->idleVelocity = g_idle_velocity;
     fdata->finishAction = 0;
     fdata->executiveTimes = 1;
     fdata->yawMode = 0;

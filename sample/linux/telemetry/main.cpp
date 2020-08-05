@@ -32,6 +32,7 @@ float32_t g_alt = 0.0;
 
 float32_t g_cur_alt = 0.0;
 float32_t g_cur_height = 0.0;
+float32_t g_idle_velocity = 3.5;
 
 int inProcessing = 0;
                      
@@ -477,7 +478,8 @@ int main(int argc, char *argv[])
 				case 'a':
 					g_xoffd = 0.0; 
 					g_yoffd = 0.0;
-					g_zoffd = strtof(str[1].c_str(), 0) - g_cur_height;
+					//g_zoffd = strtof(str[1].c_str(), 0) - g_cur_height;
+					g_zoffd = strtof(str[1].c_str(), 0) - g_cur_alt;
 					g_yawd = 0.0;
 					g_pth = 0.2;
 					g_yawth = 1.0;
@@ -505,6 +507,10 @@ int main(int argc, char *argv[])
 
 				case 'h':
 					ACTION_EVENT |= RTH;
+					break;
+
+				case 'v':
+					g_idle_velocity = strtof(str[1].c_str(), 0);
 					break;
 
 				default:
