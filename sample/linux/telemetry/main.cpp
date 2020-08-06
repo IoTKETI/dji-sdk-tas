@@ -485,6 +485,9 @@ int main(int argc, char *argv[])
 					g_yoffd = 0.0;
 					//g_zoffd = strtof(str[1].c_str(), 0) - g_cur_height;
 					//g_zoffd = strtof(str[1].c_str(), 0) - g_cur_alt;
+					if(currentHeight.altitude > 500) { // check if unit of altitude is mm or m
+						currentHeight.altitude = currentHeight.altitude / 1000;
+					}
 					g_zoffd = strtof(str[1].c_str(), 0) - currentHeight.altitude;
 					g_yawd = 0.0;
 					g_pth = 0.2;
