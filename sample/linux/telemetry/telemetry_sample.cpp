@@ -76,7 +76,7 @@ bool getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sock
 {
 	// Counters
 	unsigned long elapsedTimeInMs = 0;
-	unsigned long timeToPrintInMs = 30000000; // 1sec
+	unsigned long timeToPrintInMs = 25000000; // 1sec
 
 	// We will listen to five broadcast data sets:
 	// 1. Flight Status
@@ -102,107 +102,108 @@ bool getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sock
 	while (elapsedTimeInMs < timeToPrintInMs)
 	{
 		elapsedTimeInMs++;
-		if(elapsedTimeInMs >= timeToPrintInMs) {
-			// Matrice 100 broadcasts only flight status
-			timestamp      = vehicle->broadcast->getTimeStamp();
-			status         = vehicle->broadcast->getStatus();
-			globalPosition = vehicle->broadcast->getGlobalPosition();
-			rc             = vehicle->broadcast->getRC();
-			velocity       = vehicle->broadcast->getVelocity();
-			quaternion     = vehicle->broadcast->getQuaternion();
-			battery		   = vehicle->broadcast->getBatteryInfo();
+	}
+		//if(elapsedTimeInMs >= timeToPrintInMs) {
+	// Matrice 100 broadcasts only flight status
+	timestamp      = vehicle->broadcast->getTimeStamp();
+	status         = vehicle->broadcast->getStatus();
+	globalPosition = vehicle->broadcast->getGlobalPosition();
+	rc             = vehicle->broadcast->getRC();
+	velocity       = vehicle->broadcast->getVelocity();
+	quaternion     = vehicle->broadcast->getQuaternion();
+	battery		   = vehicle->broadcast->getBatteryInfo();
 
-			g_cur_alt = globalPosition.altitude;
-			g_cur_height = globalPosition.height;
+	g_cur_alt = globalPosition.altitude;
+	g_cur_height = globalPosition.height;
 
-			string  data;
-			data = "[";
+	string  data;
+	data = "[";
 
-			if (vehicle->isM100()) {
-				if(((unsigned)status.flight == 1) || ((unsigned)status.flight == 5)) {
-					data += "0";
-				}
-				else {
-					data += to_string((unsigned)status.flight);
-				}
-			}
-			else {
-				data += to_string((unsigned)status.flight);
-			}
-			
-			data += ",";
-			data += to_string(timestamp.time_ms);
-			data += ",";
-			cur_lati = globalPosition.latitude;
-			data += to_string((cur_lati*57.295779513082320876798154814));
-			data += ",";
-			cur_longi = globalPosition.longitude;
-			data += to_string((cur_longi*57.295779513082320876798154814));
-			data += ",";
-			data += to_string(globalPosition.altitude);
-			data += ",";
-			data += to_string(globalPosition.height);
-			data += ",";
-			data += to_string(rc.roll);
-			data += ",";
-			data += to_string(rc.pitch);
-			data += ",";
-			data += to_string(rc.yaw);
-			data += ",";
-			//data += to_string(rc.throttle);
-			//data += ",";
-			data += to_string(velocity.x);
-			data += ",";
-			data += to_string(velocity.y);
-			data += ",";
-			data += to_string(velocity.z);
-			//data += "\n";
-			data += ",";
-			data += to_string(battery.percentage);
-			data += "]";
-			// data += to_string(quaternion.q0);
-			// data += ",";
-			// data += to_string(quaternion.q1);
-			// data += ",";
-			// data += to_string(quaternion.q2);
-			// data += ",";
-			// data += to_string(quaternion.q3);
-		
-			//std::cout << data << "\n";
-
-			char *buffer = NULL;
-			buffer = (char*)malloc(strlen(data.c_str())+1);
-			strcpy(buffer,data.c_str());
-
-			send(sockfd, buffer, strlen(buffer), MSG_DONTWAIT);
-			free(buffer);
-
-			//std::cout << "-----send ---------------------------------" << "\n";
-		
-		//    std::cout << "Counter = " << elapsedTimeInMs << ":\n";
-			//std::cout << "-------\n";
-			//std::cout << "Flight Status                         = " << (unsigned)status.flight << "\n";
-			//std::cout << "Time Stamp                            = " << (unsigned)timestamp.time_ms << "\n";
-			//std::cout << "Position              (LLA)           = "
-				//<< (globalPosition.latitude*57.295779513082320876798154814) << ", " << (globalPosition.longitude*57.295779513082320876798154814)
-					  //<< ", " << globalPosition.altitude << ", " << globalPosition.height << "\n";
-			//std::cout << "RC Commands           (r/p/y/thr)     = " << rc.roll << ", "
-					  //<< rc.pitch << ", " << rc.yaw << ", " << rc.throttle << "\n";
-			//std::cout << "Velocity              (vx,vy,vz)      = " << velocity.x
-					  //<< ", " << velocity.y << ", " << velocity.z << "\n";
-			//std::cout << "Battery                               = "
-					  //<< (unsigned)battery.percentage << "\n";
-			//std::cout << "Attitude Quaternion   (w,x,y,z)       = " << quaternion.q0
-			//		  << ", " << quaternion.q1 << ", " << quaternion.q2 << ", "
-			//		 << quaternion.q3 << "\n";
-			//std::cout << "-------\n\n";
-		
-	//#endif
-			//delay_loop(500);
-			//sleep(500000);
-			//elapsedTimeInMs += 125;
+	if (vehicle->isM100()) {
+		if(((unsigned)status.flight == 1) || ((unsigned)status.flight == 5)) {
+			data += "0";
+		}
+		else {
+			data += to_string((unsigned)status.flight);
 		}
 	}
+	else {
+		data += to_string((unsigned)status.flight);
+	}
+	
+	data += ",";
+	data += to_string(timestamp.time_ms);
+	data += ",";
+	cur_lati = globalPosition.latitude;
+	data += to_string((cur_lati*57.295779513082320876798154814));
+	data += ",";
+	cur_longi = globalPosition.longitude;
+	data += to_string((cur_longi*57.295779513082320876798154814));
+	data += ",";
+	data += to_string(globalPosition.altitude);
+	data += ",";
+	data += to_string(globalPosition.height);
+	data += ",";
+	data += to_string(rc.roll);
+	data += ",";
+	data += to_string(rc.pitch);
+	data += ",";
+	data += to_string(rc.yaw);
+	data += ",";
+	//data += to_string(rc.throttle);
+	//data += ",";
+	data += to_string(velocity.x);
+	data += ",";
+	data += to_string(velocity.y);
+	data += ",";
+	data += to_string(velocity.z);
+	//data += "\n";
+	data += ",";
+	data += to_string(battery.percentage);
+	data += "]";
+	// data += to_string(quaternion.q0);
+	// data += ",";
+	// data += to_string(quaternion.q1);
+	// data += ",";
+	// data += to_string(quaternion.q2);
+	// data += ",";
+	// data += to_string(quaternion.q3);
+
+	//std::cout << data << "\n";
+
+	char *buffer = NULL;
+	buffer = (char*)malloc(strlen(data.c_str())+1);
+	strcpy(buffer,data.c_str());
+
+	send(sockfd, buffer, strlen(buffer), MSG_DONTWAIT);
+	free(buffer);
+
+	//std::cout << "-----send ---------------------------------" << "\n";
+
+//    std::cout << "Counter = " << elapsedTimeInMs << ":\n";
+	//std::cout << "-------\n";
+	//std::cout << "Flight Status                         = " << (unsigned)status.flight << "\n";
+	//std::cout << "Time Stamp                            = " << (unsigned)timestamp.time_ms << "\n";
+	//std::cout << "Position              (LLA)           = "
+		//<< (globalPosition.latitude*57.295779513082320876798154814) << ", " << (globalPosition.longitude*57.295779513082320876798154814)
+				//<< ", " << globalPosition.altitude << ", " << globalPosition.height << "\n";
+	//std::cout << "RC Commands           (r/p/y/thr)     = " << rc.roll << ", "
+				//<< rc.pitch << ", " << rc.yaw << ", " << rc.throttle << "\n";
+	//std::cout << "Velocity              (vx,vy,vz)      = " << velocity.x
+				//<< ", " << velocity.y << ", " << velocity.z << "\n";
+	//std::cout << "Battery                               = "
+				//<< (unsigned)battery.percentage << "\n";
+	//std::cout << "Attitude Quaternion   (w,x,y,z)       = " << quaternion.q0
+	//		  << ", " << quaternion.q1 << ", " << quaternion.q2 << ", "
+	//		 << quaternion.q3 << "\n";
+	//std::cout << "-------\n\n";
+	
+//#endif
+		//delay_loop(500);
+		//sleep(500000);
+		//elapsedTimeInMs += 125;
+		//}
+	//}
 	
 	
  
