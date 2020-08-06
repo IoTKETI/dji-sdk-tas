@@ -160,6 +160,12 @@ bool getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sock
 	//data += "\n";
 	data += ",";
 	data += to_string(battery.percentage);
+	data += ",";
+	data += to_string(battery.voltage);
+	data += ",";
+	data += to_string(battery.current);
+	data += ",";
+	data += to_string(battery.capacity);
 	data += "]";
 	// data += to_string(quaternion.q0);
 	// data += ",";
