@@ -32,6 +32,7 @@ float32_t g_alt = 0.0;
 
 float32_t g_cur_alt = 0.0;
 float32_t g_cur_height = 0.0;
+float32_t g_zero_alt = 0.0;
 
 const float32_t default_idle_velocity = 3.5;
 float32_t g_idle_velocity = default_idle_velocity;
@@ -461,6 +462,8 @@ int main(int argc, char *argv[])
 				switch (sw_d[0])
 				{
 				case 't':
+					currentHeight = vehicle->broadcast->getGlobalPosition();
+					g_zero_alt = currentHeight.altitude;
 					ACTION_EVENT |= TAKEOFF;
 					break;
 
@@ -488,7 +491,7 @@ int main(int argc, char *argv[])
 					if(currentHeight.altitude > 500) { // check if unit of altitude is mm or m
 						currentHeight.altitude = currentHeight.altitude / 1000;
 					}
-					g_zoffd = strtof(str[1].c_str(), 0) - currentHeight.altitude;
+					g_zoffd = strtof(str[1].c_str(), 0) - currentHeight.altitude + g_zero_alt;
 					g_yawd = 0.0;
 					g_pth = 0.2;
 					g_yawth = 1.0;
@@ -512,7 +515,7 @@ int main(int argc, char *argv[])
 						g_alt = currentHeight.altitude;
 					}
 
-					if(g_alt == 0.0) {
+					if(g_idle_velocity == 0.0) {
 						g_idle_velocity = default_idle_velocity;
 					}
 					
