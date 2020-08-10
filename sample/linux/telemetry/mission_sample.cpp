@@ -199,8 +199,7 @@ void setWaypointInitDefaults(WayPointInitSettings *fdata)
     fdata->altitude = 0;
 }
 
-std::vector<DJI::OSDK::WayPointSettings>
-createWaypoints(DJI::OSDK::Vehicle *vehicle, float32_t lat, float32_t lon, float32_t alt)
+std::vector<DJI::OSDK::WayPointSettings> createWaypoints(DJI::OSDK::Vehicle *vehicle, float32_t lat, float32_t lon, float32_t alt)
 {
     // Create Start Waypoint
     WayPointSettings start_wp;
@@ -227,7 +226,7 @@ createWaypoints(DJI::OSDK::Vehicle *vehicle, float32_t lat, float32_t lon, float
         broadcastGPosition = vehicle->broadcast->getGlobalPosition();
         start_wp.latitude = broadcastGPosition.latitude;
         start_wp.longitude = broadcastGPosition.longitude;
-        start_wp.altitude = alt;
+        start_wp.altitude = broadcastGPosition.longitude;
         /*  start_wp.latitude = lat;
 	  start_wp.longitude = lon;
 	  start_wp.altitude = alt;*/
@@ -244,16 +243,13 @@ createWaypoints(DJI::OSDK::Vehicle *vehicle, float32_t lat, float32_t lon, float
 
     //std::cout << "Uploading Waypoints..\n";
 
-    std::vector<DJI::OSDK::WayPointSettings> wpVector =
-        generateWaypointsPolygon(&start_wp, 2, lat, lon, alt);
+    std::vector<DJI::OSDK::WayPointSettings> wpVector = generateWaypointsPolygon(&start_wp, 2, lat, lon, alt);
 
     return wpVector;
 }
 
-std::vector<DJI::OSDK::WayPointSettings>
-generateWaypointsPolygon(WayPointSettings *start_data, int num_wp, float32_t lat, float32_t lon, float32_t alt)
+std::vector<DJI::OSDK::WayPointSettings> generateWaypointsPolygon(WayPointSettings *start_data, int num_wp, float32_t lat, float32_t lon, float32_t alt)
 {
-
     // Let's create a vector to store our waypoints in.
     std::vector<DJI::OSDK::WayPointSettings> wp_list;
 
@@ -262,10 +258,10 @@ generateWaypointsPolygon(WayPointSettings *start_data, int num_wp, float32_t lat
     wp_list.push_back(*start_data);
 
     // Iterative algorithm
+    WayPointSettings wp;
     for (int i = 1; i < num_wp; i++)
     {
-        WayPointSettings wp;
-        WayPointSettings *prevWp = &wp_list[i - 1];
+        //WayPointSettings *prevWp = &wp_list[i - 1];
         setWaypointDefaults(&wp);
         wp.index = i;
         wp.latitude = lat;
@@ -278,18 +274,12 @@ generateWaypointsPolygon(WayPointSettings *start_data, int num_wp, float32_t lat
     return wp_list;
 }
 
-void uploadWaypoints(Vehicle *vehicle,
-                     std::vector<DJI::OSDK::WayPointSettings> &wp_list,
-                     int responseTimeout)
+void uploadWaypoints(Vehicle *vehicle, std::vector<DJI::OSDK::WayPointSettings> &wp_list, int responseTimeout)
 {
-    for (std::vector<WayPointSettings>::iterator wp = wp_list.begin();
-         wp != wp_list.end(); ++wp)
+    for (std::vector<WayPointSettings>::iterator wp = wp_list.begin(); wp != wp_list.end(); ++wp)
     {
-        printf("Waypoint created at (LLA): %f \t%f \t%f\n ", wp->latitude,
-               wp->longitude, wp->altitude);
-        ACK::WayPointIndex wpDataACK =
-            vehicle->missionManager->wpMission->uploadIndexData(&(*wp),
-                                                                responseTimeout);
+        printf("Waypoint created at (LLA): %f \t%f \t%f\n ", wp->latitude, wp->longitude, wp->altitude);
+        ACK::WayPointIndex wpDataACK = vehicle->missionManager->wpMission->uploadIndexData(&(*wp), responseTimeout);
 
         ACK::getErrorCodeMessage(wpDataACK.ack, __func__);
     }

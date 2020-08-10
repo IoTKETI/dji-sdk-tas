@@ -486,8 +486,6 @@ int main(int argc, char *argv[])
 					currentHeight = vehicle->broadcast->getGlobalPosition();					
 					g_xoffd = 0.0; 
 					g_yoffd = 0.0;
-					//g_zoffd = strtof(str[1].c_str(), 0) - g_cur_height;
-					//g_zoffd = strtof(str[1].c_str(), 0) - g_cur_alt;
 					if(currentHeight.altitude > 500) { // check if unit of altitude is mm or m
 						currentHeight.altitude = currentHeight.altitude / 1000;
 					}
@@ -507,11 +505,10 @@ int main(int argc, char *argv[])
 					g_responseTimeout = responseTimeout;
 					g_lat = (strtof(str[1].c_str(), 0)/57.295779513082320876798154814);
 					g_lon = (strtof(str[2].c_str(), 0)/57.295779513082320876798154814);
-					g_alt = g_zero_alt + strtof(str[1].c_str(), 0); // strtof(str[3].c_str(), 0);
+					g_alt = g_zero_alt + strtof(str[3].c_str(), 0); // strtof(str[3].c_str(), 0);
 					g_idle_velocity = strtof(str[4].c_str(), 0);
 
 					if(g_alt == 0.0) {
-						//g_alt = g_cur_height;
 						g_alt = currentHeight.altitude;
 					}
 
