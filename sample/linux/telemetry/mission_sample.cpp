@@ -38,13 +38,13 @@ using namespace DJI::OSDK::Telemetry;
 extern float32_t g_idle_velocity;
 extern float32_t g_zero_alt;
 
-void mission_delay_loop_ms(unsigned int timeout_ms) {
-	unsigned long timeout_count = (timeout_ms * 30000);
-	unsigned long i= 0;
+// void mission_delay_loop_ms(unsigned int timeout_ms) {
+// 	unsigned long timeout_count = (timeout_ms * 30000);
+// 	unsigned long i= 0;
 	
-	for(i = 0; i < timeout_count; i++) {
-	}
-}
+// 	for(i = 0; i < timeout_count; i++) {
+// 	}
+// }
 
 
 bool setUpSubscription(DJI::OSDK::Vehicle *vehicle, int responseTimeout)
@@ -114,8 +114,8 @@ bool runWaypointMission(Vehicle *vehicle, uint8_t numWaypoints, int responseTime
             std::cout << "Failed to set up Subscription!" << std::endl;
             return false;
         }
-        //sleep(1);
-        mission_delay_loop_ms(1000);
+        sleep(1);
+        //mission_delay_loop_ms(1000);
     }
 
     // Waypoint Mission : Initialization
@@ -137,7 +137,6 @@ bool runWaypointMission(Vehicle *vehicle, uint8_t numWaypoints, int responseTime
     std::cout << "Initializing Waypoint Mission..\n";
 
     // Waypoint Mission: Create Waypoints
-
     std::vector<WayPointSettings> generatedWaypts = createWaypoints(vehicle, lat, lon, alt);
     std::cout << "Creating Waypoints..\n ";
     //printf("%f", generatedWaypts);
@@ -148,10 +147,9 @@ bool runWaypointMission(Vehicle *vehicle, uint8_t numWaypoints, int responseTime
 
     // Waypoint Mission: Start
     ACK::ErrorCode startAck = vehicle->missionManager->wpMission->start(responseTimeout);
-
     if (ACK::getError(startAck))
     {
-        ACK::getErrorCodeMessage(initAck, __func__);
+        ACK::getErrorCodeMessage(startAck, __func__);
     }
     else
     {
@@ -197,7 +195,7 @@ void setWaypointInitDefaults(WayPointInitSettings *fdata)
     fdata->gimbalPitch = 0;
     fdata->latitude = 0;
     fdata->longitude = 0;
-    fdata->altitude = g_zero_alt;
+    fdata->altitude = 0;
 }
 
 std::vector<DJI::OSDK::WayPointSettings> createWaypoints(DJI::OSDK::Vehicle *vehicle, float32_t lat, float32_t lon, float32_t alt)
@@ -218,9 +216,7 @@ std::vector<DJI::OSDK::WayPointSettings> createWaypoints(DJI::OSDK::Vehicle *veh
         start_wp.longitude = subscribeGPosition.longitude;
         start_wp.altitude = alt;
 
-        /* printf("Waypoint created at (LLA): %f \t%f \t%f\n",
-           subscribeGPosition.latitude, subscribeGPosition.longitude,
-           alt);*/
+        // printf("Waypoint created at (LLA): %f \t%f \t%f\n", subscribeGPosition.latitude, subscribeGPosition.longitude, alt);
     }
     else
     {
@@ -228,6 +224,7 @@ std::vector<DJI::OSDK::WayPointSettings> createWaypoints(DJI::OSDK::Vehicle *veh
         start_wp.latitude = broadcastGPosition.latitude;
         start_wp.longitude = broadcastGPosition.longitude;
         start_wp.altitude = alt;
+
         /*  start_wp.latitude = lat;
 	  start_wp.longitude = lon;
 	  start_wp.altitude = alt;*/
@@ -295,8 +292,8 @@ bool runHotpointMission(Vehicle *vehicle, int responseTimeout, float32_t lat, fl
             std::cout << "Failed to set up Subscription!" << std::endl;
             return false;
         }
-        //sleep(1);
-        mission_delay_loop_ms(1000);
+        sleep(1);
+        //mission_delay_loop_ms(1000);
     }
 
     // Global position retrieved via subscription
@@ -341,8 +338,8 @@ bool runHotpointMission(Vehicle *vehicle, int responseTimeout, float32_t lat, fl
     }
     else
     {
-        //sleep(15);
-        mission_delay_loop_ms(15000);
+        sleep(15);
+        //mission_delay_loop_ms(15000);
     }
 
     // Start

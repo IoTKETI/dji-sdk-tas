@@ -99,10 +99,13 @@ bool getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sock
 	ACK::ErrorCode ack = vehicle->broadcast->setBroadcastFreqDefaults(TIMEOUT);
 
   // Print in a loop for 2 seconds
-	while (elapsedTimeInMs < timeToPrintInMs)
-	{
-		elapsedTimeInMs++;
-	}
+	// while (elapsedTimeInMs < timeToPrintInMs)
+	// {
+	// 	elapsedTimeInMs++;
+	// }
+
+	sleep(900);
+
 		//if(elapsedTimeInMs >= timeToPrintInMs) {
 	// Matrice 100 broadcasts only flight status
 	timestamp      = vehicle->broadcast->getTimeStamp();

@@ -168,8 +168,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            //usleep(10000);
-            flight_delay_loop_ms(100);
+            sleep(10);
+            //flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
             //loop_count = 0;
@@ -201,8 +201,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            //usleep(10000);
-            flight_delay_loop_ms(100);
+            sleep(100);
+            //flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
             //loop_count = 0;
@@ -213,7 +213,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
 
         if (stillOnGround < timeoutCycles)
         {
-            std::cout << "Aircraft in air!\n" << std::endl;
+            std::cout << "Aircraft in air!" << std::endl;
         }
     }
     else // M100
@@ -224,8 +224,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            //usleep(10000);
-            flight_delay_loop_ms(100);
+            sleep(100);
+            //flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
             //loop_count = 0;
@@ -249,27 +249,27 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() == VehicleStatus::DisplayMode::MODE_AUTO_TAKEOFF) &&
                loop_count < timeoutCycles)
         {
-            //usleep(10000);
-            flight_delay_loop_ms(100);
+            sleep(1);
+            //flight_delay_loop_ms(100);
             loop_count++;
             printf("LLLLL- %ld\n", loop_count);
         }
 
-        if (loop_count >= timeoutCycles)
-        {
-            std::cout << "Takeoff failed. mode is MODE_ASSISTED_TAKEOFF, MODE_AUTO_TAKEOFF yet." << std::endl;
+        // if (loop_count >= timeoutCycles)
+        // {
+        //     std::cout << "Takeoff failed. mode is MODE_ASSISTED_TAKEOFF, MODE_AUTO_TAKEOFF yet." << std::endl;
 
-            // Cleanup
-            if (!vehicle->isM100() && !vehicle->isLegacyM600())
-            {
-                vehicle->subscribe->removePackage(0, timeout);
-            }
-            return false;
-        }
-        else
-        {
-            std::cout << "Aircraft in air!\n";
-        }
+        //     // Cleanup
+        //     if (!vehicle->isM100() && !vehicle->isLegacyM600())
+        //     {
+        //         vehicle->subscribe->removePackage(0, timeout);
+        //     }
+        //     return false;
+        // }
+        // else
+        // {
+        //     std::cout << "Aircraft in air!\n";
+        // }
 
         if (!vehicle->isM100() && !vehicle->isLegacyM600())
         {
@@ -296,8 +296,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
         loop_count = 0;
         do
         {
-            //usleep(300000);
-            flight_delay_loop_ms(300);
+            sleep(4);
+            //flight_delay_loop_ms(300);
             currentHeight = vehicle->broadcast->getGlobalPosition();
             delta = fabs(currentHeight.altitude - deltaHeight.altitude);
             deltaHeight.altitude = currentHeight.altitude;
@@ -305,16 +305,18 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
             loop_count++;
             printf("MMMMM- %ld\n", loop_count);
 
-        } while (delta >= 0.009 && loop_count < timeoutCycles);
+        } while (delta >= 0.009); // && loop_count < timeoutCycles);
 
-        if (loop_count >= timeoutCycles)
-        {
-            std::cout << "Takeoff failed. The aircraft has not reached the target altitude.\n" << std::endl;
-        }
-        else
-        {
-            std::cout << "Aircraft hovering at " << currentHeight.altitude << "m!\n";
-        }
+        // if (loop_count >= timeoutCycles)
+        // {
+        //     std::cout << "Takeoff failed. The aircraft has not reached the target altitude.\n" << std::endl;
+        // }
+        // else
+        // {
+        //     std::cout << "Aircraft hovering at " << currentHeight.altitude << "m!\n";
+        // }
+
+        std::cout << "Aircraft hovering at " << currentHeight.altitude << "m!\n";
     }
 
     // Cleanup
@@ -344,9 +346,9 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
     // the
     // mission
     int responseTimeout = 1;
-    int timeoutInMilSec = 100000; // 100000 msec
+    int timeoutInMilSec = 10000; // 100000 msec
     int controlFreqInHz = 50; // Hz
-    int cycleTimeInMs = 10000 / controlFreqInHz; // 20 msec
+    int cycleTimeInMs = 1000 / controlFreqInHz; // 20 msec
     int outOfControlBoundsTimeLimit = 10 * cycleTimeInMs;  // 10 cycles
     int withinControlBoundsTimeReqmt = 50 * cycleTimeInMs; // 50 cycles
     int pkgIndex;
@@ -390,8 +392,8 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
     }
 
     // Wait for data to come in
-    //sleep(1);
-    flight_delay_loop_ms(1000);
+    sleep(1);
+    //flight_delay_loop_ms(1000);
 
     // Get data
 
@@ -410,6 +412,9 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
         currentSubscriptionGPS = vehicle->subscribe->getValue<TOPIC_GPS_FUSED>();
         originSubscriptionGPS = currentSubscriptionGPS;
         localOffsetFromGpsOffset(vehicle, localOffset, static_cast<void *>(&currentSubscriptionGPS), static_cast<void *>(&originSubscriptionGPS));
+        
+        // Get the broadcast GP since we need the height for zCmd
+        currentBroadcastGP = vehicle->broadcast->getGlobalPosition();
     }
     else
     {
@@ -455,7 +460,7 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
     // There is a deadband in position control
     // the z cmd is absolute height
     // while x and y are in relative
-    float zDeadband = 0.22;
+    float zDeadband = 0.12;
 
     if (vehicle->isM100() || vehicle->isLegacyM600())
     {
@@ -502,8 +507,8 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
     {
         vehicle->control->positionAndYawCtrl(xCmd, yCmd, zCmd, yawDesiredRad / DEG2RAD);
 
-        //usleep(cycleTimeInMs * 1000);
-        flight_delay_loop_ms(cycleTimeInMs);
+        sleep(cycleTimeInMs);
+        //flight_delay_loop_ms(cycleTimeInMs);
         elapsedTimeInMs += cycleTimeInMs;
         //loop_count++;
         //if(loop_count > 16384) {
@@ -519,6 +524,9 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
             yawInRad = toEulerAngle((static_cast<void *>(&subscriptionQ))).z;
             currentSubscriptionGPS = vehicle->subscribe->getValue<TOPIC_GPS_FUSED>();
             localOffsetFromGpsOffset(vehicle, localOffset, static_cast<void *>(&currentSubscriptionGPS), static_cast<void *>(&originSubscriptionGPS));
+
+            // Get the broadcast GP since we need the height for zCmd
+            currentBroadcastGP = vehicle->broadcast->getGlobalPosition();
         }
         else
         {
@@ -567,19 +575,19 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
         }
 
         if (vehicle->isM100() &&
-            std::abs(xOffsetRemaining) <= posThresholdInM &&
-            std::abs(yOffsetRemaining) <= posThresholdInM &&
-            std::abs(zOffsetRemaining) <= zDeadband &&
-            std::abs(yawInRad - yawDesiredRad) <= yawThresholdInRad)
+            std::abs(xOffsetRemaining) < posThresholdInM &&
+            std::abs(yOffsetRemaining) < posThresholdInM &&
+            std::abs(zOffsetRemaining) < zDeadband &&
+            std::abs(yawInRad - yawDesiredRad) < yawThresholdInRad)
         {
             //! 1. We are within bounds; start incrementing our in-bound counter
             withinBoundsCounter += cycleTimeInMs;
             printf("[1] withinBoundsCounter = %ld\r\n", withinBoundsCounter);
         }
-        else if (std::abs(xOffsetRemaining) <= posThresholdInM &&
-                 std::abs(yOffsetRemaining) <= posThresholdInM &&
-                 std::abs(zOffsetRemaining) <= zDeadband &&
-                 std::abs(yawInRad - yawDesiredRad) <= yawThresholdInRad)
+        else if (std::abs(xOffsetRemaining) < posThresholdInM &&
+                 std::abs(yOffsetRemaining) < posThresholdInM &&
+                 std::abs(zOffsetRemaining) < zDeadband &&
+                 std::abs(yawInRad - yawDesiredRad) < yawThresholdInRad)
         {
             //! 1. We are within bounds; start incrementing our in-bound counter
             withinBoundsCounter += cycleTimeInMs;
@@ -617,8 +625,8 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
         while (brakeCounter < withinControlBoundsTimeReqmt)
         {
             vehicle->control->emergencyBrake();
-            //usleep(cycleTimeInMs);
-            flight_delay_loop_ms(cycleTimeInMs);
+            usleep(cycleTimeInMs * 10);
+            //flight_delay_loop_ms(cycleTimeInMs);
             brakeCounter += cycleTimeInMs;
             //loop_count++;
             //if(loop_count > 16384) {
@@ -649,8 +657,7 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
         ACK::ErrorCode ack = vehicle->subscribe->removePackage(pkgIndex, responseTimeout);
         if (ACK::getError(ack))
         {
-            std::cout << "Error unsubscribing; please restart the drone/FC to get back "
-                         "to a clean state.\n";
+            std::cout << "Error unsubscribing; please restart the drone/FC to get back to a clean state.\n";
         }
     }
 

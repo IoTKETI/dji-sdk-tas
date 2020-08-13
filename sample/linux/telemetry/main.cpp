@@ -298,6 +298,19 @@ void *action_alt(void *arg)
 			
 			inProcessing = 0;
 		}
+		else if(ACTION_EVENT & MOVE) {
+			ACTION_EVENT &= ~MOVE;
+
+			printf("\r\nMOVE\r\n");
+			
+			inProcessing = 1;
+			
+			//vehicle->obtainCtrlAuthority(functionTimeout);
+			
+			moveByPositionOffset(vehicle, g_xoffd, g_yoffd, g_zoffd, g_yawd, g_pth, g_yawth);
+			
+			inProcessing = 0;
+		}
 	}
 }
 
@@ -462,16 +475,19 @@ int main(int argc, char *argv[])
 				switch (sw_d[0])
 				{
 				case 't':
+					vehicle->obtainCtrlAuthority(functionTimeout);
 					currentHeight = vehicle->broadcast->getGlobalPosition();
 					g_zero_alt = currentHeight.altitude;
 					ACTION_EVENT |= TAKEOFF;
 					break;
 
 				case 'l':
+					vehicle->obtainCtrlAuthority(functionTimeout);
 					ACTION_EVENT |= LAND;
 					break;
 									
 				case 'm':
+					vehicle->obtainCtrlAuthority(functionTimeout);
 					g_xoffd = strtof(str[1].c_str(), 0);
 					g_yoffd = strtof(str[2].c_str(), 0);
 					g_zoffd = strtof(str[3].c_str(), 0);
@@ -483,12 +499,13 @@ int main(int argc, char *argv[])
 					break;
 					
 				case 'a':
-					currentHeight = vehicle->broadcast->getGlobalPosition();					
+					vehicle->obtainCtrlAuthority(functionTimeout);
+					// currentHeight = vehicle->broadcast->getGlobalPosition();					
 					g_xoffd = 0.0; 
 					g_yoffd = 0.0;
-					if(currentHeight.altitude > 500) { // check if unit of altitude is mm or m
-						currentHeight.altitude = currentHeight.altitude / 1000;
-					}
+					// if(currentHeight.altitude > 500) { // check if unit of altitude is mm or m
+					// 	currentHeight.altitude = currentHeight.altitude / 1000;
+					// }
 					//g_zoffd = g_zero_alt + strtof(str[1].c_str(), 0) - currentHeight.altitude;
 					g_zoffd = strtof(str[1].c_str(), 0);
 					g_yawd = 0.0;
@@ -499,6 +516,7 @@ int main(int argc, char *argv[])
 					break;
 
 				case 'g':
+					vehicle->obtainCtrlAuthority(functionTimeout);
 					currentHeight = vehicle->broadcast->getGlobalPosition();
 					printf("g command = original data : %f, %f, %f\r\n", strtof(str[1].c_str(), 0), strtof(str[2].c_str(), 0), strtof(str[3].c_str(), 0));
 						
@@ -511,7 +529,8 @@ int main(int argc, char *argv[])
 					g_idle_velocity = strtof(str[4].c_str(), 0);
 
 					if(g_alt == 0.0) {
-						g_alt = currentHeight.altitude;
+						//g_alt = currentHeight.altitude;
+						g_alt = currentHeight.height;
 					}
 
 					if(g_idle_velocity == 0.0) {
