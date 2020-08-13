@@ -195,8 +195,8 @@ bool getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sock
 				//<< ", " << globalPosition.altitude << ", " << globalPosition.height << "\n";
 	//std::cout << "RC Commands           (r/p/y/thr)     = " << rc.roll << ", "
 				//<< rc.pitch << ", " << rc.yaw << ", " << rc.throttle << "\n";
-	//std::cout << "Velocity              (vx,vy,vz)      = " << velocity.x
-				//<< ", " << velocity.y << ", " << velocity.z << "\n";
+//	std::cout << "Velocity              (vx,vy,vz)      = " << velocity.x
+//				<< ", " << velocity.y << ", " << velocity.z << "\n";
 	//std::cout << "Battery                               = "
 				//<< (unsigned)battery.percentage << "\n";
 	//std::cout << "Attitude Quaternion   (w,x,y,z)       = " << quaternion.q0

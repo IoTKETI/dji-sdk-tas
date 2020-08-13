@@ -36,6 +36,7 @@ using namespace DJI::OSDK;
 using namespace DJI::OSDK::Telemetry;
 
 extern float32_t g_idle_velocity;
+extern float32_t g_zero_alt;
 
 void mission_delay_loop_ms(unsigned int timeout_ms) {
 	unsigned long timeout_count = (timeout_ms * 30000);
@@ -196,7 +197,7 @@ void setWaypointInitDefaults(WayPointInitSettings *fdata)
     fdata->gimbalPitch = 0;
     fdata->latitude = 0;
     fdata->longitude = 0;
-    fdata->altitude = 0;
+    fdata->altitude = g_zero_alt;
 }
 
 std::vector<DJI::OSDK::WayPointSettings> createWaypoints(DJI::OSDK::Vehicle *vehicle, float32_t lat, float32_t lon, float32_t alt)
@@ -226,7 +227,7 @@ std::vector<DJI::OSDK::WayPointSettings> createWaypoints(DJI::OSDK::Vehicle *veh
         broadcastGPosition = vehicle->broadcast->getGlobalPosition();
         start_wp.latitude = broadcastGPosition.latitude;
         start_wp.longitude = broadcastGPosition.longitude;
-        start_wp.altitude = broadcastGPosition.longitude;
+        start_wp.altitude = alt;
         /*  start_wp.latitude = lat;
 	  start_wp.longitude = lon;
 	  start_wp.altitude = alt;*/
