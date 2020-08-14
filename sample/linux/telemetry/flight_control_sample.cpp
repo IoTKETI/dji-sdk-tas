@@ -97,7 +97,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
             motorsNotStarted++;
             usleep(100 * 1000);
             //flight_delay_loop_ms(10);
-            printf("GGGGG- %ld", loop_count);
+            printf("GGGGG- %ld\n", loop_count);
         }
 
         if (motorsNotStarted >= timeoutCycles)
@@ -628,12 +628,12 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
             usleep(cycleTimeInMs * 10);
             //flight_delay_loop_ms(cycleTimeInMs);
             brakeCounter += cycleTimeInMs;
-            //loop_count++;
+            loop_count++;
             //if(loop_count > 16384) {
             //loop_count = 0;
             //break;
             //}
-            printf("OOOOO- %ld", loop_count);
+            printf("OOOOO- %ld\n", loop_count);
         }
     }
 
