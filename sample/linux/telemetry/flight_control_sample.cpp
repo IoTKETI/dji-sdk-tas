@@ -168,7 +168,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            sleep(10);
+            usleep(10 * 1000);
             //flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
@@ -201,7 +201,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            sleep(100);
+            usleep(100*1000);
             //flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
@@ -224,7 +224,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            sleep(100);
+            usleep(100*1000);
             //flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
@@ -249,7 +249,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() == VehicleStatus::DisplayMode::MODE_AUTO_TAKEOFF) &&
                loop_count < timeoutCycles)
         {
-            sleep(1);
+            usleep(1*1000);
             //flight_delay_loop_ms(100);
             loop_count++;
             printf("LLLLL- %ld\n", loop_count);
@@ -296,7 +296,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
         loop_count = 0;
         do
         {
-            sleep(4);
+            usleep(4*1000);
             //flight_delay_loop_ms(300);
             currentHeight = vehicle->broadcast->getGlobalPosition();
             delta = fabs(currentHeight.altitude - deltaHeight.altitude);
@@ -392,7 +392,7 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
     }
 
     // Wait for data to come in
-    sleep(1);
+    usleep(1*1000);
     //flight_delay_loop_ms(1000);
 
     // Get data
@@ -507,7 +507,7 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
     {
         vehicle->control->positionAndYawCtrl(xCmd, yCmd, zCmd, yawDesiredRad / DEG2RAD);
 
-        sleep(cycleTimeInMs);
+        usleep(cycleTimeInMs*1000);
         //flight_delay_loop_ms(cycleTimeInMs);
         elapsedTimeInMs += cycleTimeInMs;
         //loop_count++;

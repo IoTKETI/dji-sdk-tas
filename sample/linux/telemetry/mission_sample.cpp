@@ -114,7 +114,7 @@ bool runWaypointMission(Vehicle *vehicle, uint8_t numWaypoints, int responseTime
             std::cout << "Failed to set up Subscription!" << std::endl;
             return false;
         }
-        sleep(1);
+        usleep(1*1000);
         //mission_delay_loop_ms(1000);
     }
 
@@ -292,7 +292,7 @@ bool runHotpointMission(Vehicle *vehicle, int responseTimeout, float32_t lat, fl
             std::cout << "Failed to set up Subscription!" << std::endl;
             return false;
         }
-        sleep(1);
+        usleep(1*1000);
         //mission_delay_loop_ms(1000);
     }
 
@@ -338,7 +338,7 @@ bool runHotpointMission(Vehicle *vehicle, int responseTimeout, float32_t lat, fl
     }
     else
     {
-        sleep(15);
+        usleep(15*1000);
         //mission_delay_loop_ms(15000);
     }
 
@@ -355,7 +355,7 @@ bool runHotpointMission(Vehicle *vehicle, int responseTimeout, float32_t lat, fl
         }
         return false;
     }
-    //sleep(20);
+    //usleep(20*1000);
 
     //// Pause
     //std::cout << "Pause for 5s" << std::endl;
@@ -365,7 +365,7 @@ bool runHotpointMission(Vehicle *vehicle, int responseTimeout, float32_t lat, fl
     //{
     //  ACK::getErrorCodeMessage(pauseAck, __func__);
     //}
-    //sleep(5);
+    //usleep(5*1000);
 
     //// Resume
     //std::cout << "Resume" << std::endl;
@@ -375,13 +375,13 @@ bool runHotpointMission(Vehicle *vehicle, int responseTimeout, float32_t lat, fl
     //{
     //  ACK::getErrorCodeMessage(resumeAck, __func__);
     //}
-    //sleep(10);
+    //usleep(10*1000);
 
     //// Update radius, no ACK
     //std::cout << "Update radius to 1.5x: new radius = " << 1.5 * initialRadius
     //          << std::endl;
     //vehicle->missionManager->hpMission->updateRadius(1.5 * initialRadius);
-    //sleep(10);
+    //usleep(10*1000);
 
     //// Update velocity (yawRate), no ACK
     //std::cout << "Update hotpoint rotation rate: new rate = 5 deg/s" << std::endl;
@@ -389,7 +389,7 @@ bool runHotpointMission(Vehicle *vehicle, int responseTimeout, float32_t lat, fl
     //yawRateStruct.clockwise = 1;
     //yawRateStruct.yawRate   = 5;
     //vehicle->missionManager->hpMission->updateYawRate(yawRateStruct);
-    //sleep(10);
+    //usleep(10*1000);
 
     //// Stop
     //std::cout << "Stop" << std::endl;
@@ -405,7 +405,7 @@ bool runHotpointMission(Vehicle *vehicle, int responseTimeout, float32_t lat, fl
     //else
     //{
     //  // No error. Wait for a few seconds to land
-    //  sleep(10);
+    //  usleep(10*1000);
     //}
 
     // Clean up

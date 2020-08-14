@@ -104,7 +104,7 @@ bool getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sock
 	// 	elapsedTimeInMs++;
 	// }
 
-	sleep(900);
+	usleep(900*1000);
 
 		//if(elapsedTimeInMs >= timeToPrintInMs) {
 	// Matrice 100 broadcasts only flight status
@@ -209,7 +209,7 @@ bool getBroadcastData(DJI::OSDK::Vehicle* vehicle, int responseTimeout, int sock
 	
 //#endif
 		//delay_loop(500);
-		//sleep(500000);
+		//usleep(500000);
 		//elapsedTimeInMs += 125;
 		//}
 	//}
@@ -677,8 +677,8 @@ bool subscribeToData(Vehicle* vehicle, int responseTimeout , int sockfd)
 	}
 
 	// Wait for the data to start coming in.
-	//sleep(1);
-	telemetry_delay_loop_ms(1000);
+	usleep(1*1000);
+	//telemetry_delay_loop_ms(1000);
 
 	// Get all the data once before the loop to initialize vars
 	TypeMap<TOPIC_STATUS_FLIGHT>::type     flightStatus;
