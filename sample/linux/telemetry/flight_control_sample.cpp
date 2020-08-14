@@ -95,7 +95,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                motorsNotStarted < timeoutCycles)
         {
             motorsNotStarted++;
-            usleep(10000);
+            usleep(100 * 1000);
             //flight_delay_loop_ms(10);
             printf("GGGGG- %ld", loop_count);
         }
@@ -122,7 +122,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                motorsNotStarted < timeoutCycles)
         {
             motorsNotStarted++;
-            usleep(10 * 1000);
+            usleep(100 * 1000);
             //flight_delay_loop_ms(100);
             printf("FFFFF- %ld\n", loop_count);
         }
@@ -139,7 +139,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                motorsNotStarted < timeoutCycles)
         {
             motorsNotStarted++;
-            usleep(10 * 1000);
+            usleep(100 * 1000);
             //flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
@@ -168,7 +168,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            usleep(10 * 1000);
+            usleep(100 * 1000);
             //flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
@@ -201,7 +201,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            usleep(100*1000);
+            usleep(100 * 1000);
             //flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
@@ -224,7 +224,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                stillOnGround < timeoutCycles)
         {
             stillOnGround++;
-            usleep(100*1000);
+            usleep(100 * 1000);
             //flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
@@ -249,7 +249,7 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() == VehicleStatus::DisplayMode::MODE_AUTO_TAKEOFF) &&
                loop_count < timeoutCycles)
         {
-            usleep(1*1000);
+            usleep(100 * 1000);
             //flight_delay_loop_ms(100);
             loop_count++;
             printf("LLLLL- %ld\n", loop_count);
@@ -292,11 +292,11 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
         Telemetry::GlobalPosition currentHeight;
         Telemetry::GlobalPosition deltaHeight = vehicle->broadcast->getGlobalPosition();
 
-        timeoutCycles = 100;
+        timeoutCycles = 20;
         loop_count = 0;
         do
         {
-            usleep(4*1000);
+            usleep(500*1000);
             //flight_delay_loop_ms(300);
             currentHeight = vehicle->broadcast->getGlobalPosition();
             delta = fabs(currentHeight.altitude - deltaHeight.altitude);
