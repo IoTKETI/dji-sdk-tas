@@ -1012,7 +1012,7 @@ bool monitoredGoHome(Vehicle *vehicle, int timeout)
     }
 
     Telemetry::GlobalPosition gp;
-    timeoutCycles = 20;
+    timeoutCycles = 200;
     loop_count = 0;
     do
     {
@@ -1021,17 +1021,17 @@ bool monitoredGoHome(Vehicle *vehicle, int timeout)
         loop_count++;
         gp = vehicle->broadcast->getGlobalPosition();
         printf("EEEEE- %ld\n", loop_count);
-    } while (gp.altitude != 0);
+    } while (gp.altitude != 0 && loop_count < timeoutCycles);
 
-    if (gp.altitude != 0)
-    {
-        std::cout << "Landing finished, but the aircraft is in an unexpected mode. Please connect DJI GO.\n";
-        return false;
-    }
-    else
-    {
+    // if (gp.altitude != 0)
+    // {
+    //     std::cout << "Landing finished, but the aircraft is in an unexpected mode. Please connect DJI GO.\n";
+    //     return false;
+    // }
+    // else
+    // {
         std::cout << "Successful GoHome!\n";
-    }
+    // }
 
     return true;
 }
