@@ -298,19 +298,19 @@ void *action_alt(void *arg)
 			
 			inProcessing = 0;
 		}
-		else if(ACTION_EVENT & MOVE) {
-			ACTION_EVENT &= ~MOVE;
+		// else if(ACTION_EVENT & MOVE) {
+		// 	ACTION_EVENT &= ~MOVE;
 
-			printf("\r\nMOVE\r\n");
+		// 	printf("\r\nMOVE\r\n");
 			
-			inProcessing = 1;
+		// 	inProcessing = 1;
 			
-			//vehicle->obtainCtrlAuthority(functionTimeout);
+		// 	//vehicle->obtainCtrlAuthority(functionTimeout);
 			
-			moveByPositionOffset(vehicle, g_xoffd, g_yoffd, g_zoffd, g_yawd, g_pth, g_yawth);
+		// 	moveByPositionOffset(vehicle, g_xoffd, g_yoffd, g_zoffd, g_yawd, g_pth, g_yawth);
 			
-			inProcessing = 0;
-		}
+		// 	inProcessing = 0;
+		// }
 	}
 }
 
