@@ -25,7 +25,7 @@ using namespace DJI::OSDK::Telemetry;
 	
 // 	for(i = 0; i < timeout_count; i++) {
 // 	}
-}
+// }
 
 
 /*! Monitored Takeoff (Blocking API call). Return status as well as ack.
