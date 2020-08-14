@@ -19,12 +19,12 @@ uint32_t loop_count = 0;
 using namespace DJI::OSDK;
 using namespace DJI::OSDK::Telemetry;
 
-void flight_delay_loop_ms(unsigned int timeout_ms) {
-	unsigned long timeout_count = (timeout_ms * 30000);
-	unsigned long i= 0;
+// void flight_delay_loop_ms(unsigned int timeout_ms) {
+// 	unsigned long timeout_count = (timeout_ms * 30000);
+// 	unsigned long i= 0;
 	
-	for(i = 0; i < timeout_count; i++) {
-	}
+// 	for(i = 0; i < timeout_count; i++) {
+// 	}
 }
 
 
@@ -1005,10 +1005,10 @@ bool monitoredGoHome(Vehicle *vehicle, int timeout)
     while (vehicle->broadcast->getStatus().flight == DJI::OSDK::VehicleStatus::M100FlightStatus::FINISHING_LANDING && 
            loop_count < timeoutCycles)
     {
-        //usleep(100000);
-        flight_delay_loop_ms(100);
+        usleep(100* 1000);
+        //flight_delay_loop_ms(100);
         loop_count++;
-        printf("DDDDD- %ld", loop_count);
+        printf("DDDDD- %ld\n", loop_count);
     }
 
     Telemetry::GlobalPosition gp;
@@ -1016,12 +1016,12 @@ bool monitoredGoHome(Vehicle *vehicle, int timeout)
     loop_count = 0;
     do
     {
-        //usleep(100000);
-        flight_delay_loop_ms(100);
+        usleep(100 * 1000);
+        //flight_delay_loop_ms(100);
         loop_count++;
         gp = vehicle->broadcast->getGlobalPosition();
-        printf("EEEEE- %ld", loop_count);
-    } while (gp.altitude != 0 && loop_count < timeoutCycles);
+        printf("EEEEE- %ld\n", loop_count);
+    } while (gp.altitude != 0);
 
     if (gp.altitude != 0)
     {
