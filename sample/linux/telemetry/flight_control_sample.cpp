@@ -95,8 +95,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                motorsNotStarted < timeoutCycles)
         {
             motorsNotStarted++;
-            //usleep(10000);
-            flight_delay_loop_ms(10);
+            usleep(10000);
+            //flight_delay_loop_ms(10);
             printf("GGGGG- %ld", loop_count);
         }
 
@@ -122,8 +122,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                motorsNotStarted < timeoutCycles)
         {
             motorsNotStarted++;
-            //usleep(10000);
-            flight_delay_loop_ms(100);
+            usleep(10 * 1000);
+            //flight_delay_loop_ms(100);
             printf("FFFFF- %ld\n", loop_count);
         }
 
@@ -139,8 +139,8 @@ bool monitoredTakeoff(Vehicle *vehicle, int timeout)
                motorsNotStarted < timeoutCycles)
         {
             motorsNotStarted++;
-            //usleep(10000);
-            flight_delay_loop_ms(100);
+            usleep(10 * 1000);
+            //flight_delay_loop_ms(100);
             //loop_count++;
             //if(loop_count > 16384) {
             //loop_count = 0;
@@ -346,7 +346,7 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
     // the
     // mission
     int responseTimeout = 1;
-    int timeoutInMilSec = 10000; // 100000 msec
+    int timeoutInMilSec = 100000; // 100000 msec
     int controlFreqInHz = 50; // Hz
     int cycleTimeInMs = 1000 / controlFreqInHz; // 20 msec
     int outOfControlBoundsTimeLimit = 10 * cycleTimeInMs;  // 10 cycles
