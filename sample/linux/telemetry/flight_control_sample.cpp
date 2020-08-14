@@ -772,9 +772,9 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
                landingNotStarted < timeoutCycles)
         {
             landingNotStarted++;
-            //usleep(10000);
-            flight_delay_loop_ms(10);
-            printf("PPPPP- %ld", loop_count);
+            usleep(100 * 1000);
+            //flight_delay_loop_ms(10);
+            printf("PPPPP- %ld\n", loop_count);
         }
 
         if (landingNotStarted >= timeoutCycles)
