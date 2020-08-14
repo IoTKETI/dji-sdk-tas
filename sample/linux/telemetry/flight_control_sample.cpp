@@ -810,13 +810,13 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
     }
     else if (vehicle->isLegacyM600())
     {
-        timeoutCycles = 20;
+        timeoutCycles = 300;
         loop_count = 0;
         while (vehicle->broadcast->getStatus().flight >DJI::OSDK::VehicleStatus::FlightStatus::STOPED &&
                loop_count < timeoutCycles)
         {
-            //usleep(100000);
-            flight_delay_loop_ms(100);
+            usleep(100 * 1000);
+            //flight_delay_loop_ms(100);
             loop_count++;
             printf("AAAAA - %ld", loop_count);
         }
@@ -825,11 +825,11 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
         loop_count = 0;
         do
         {
-            //usleep(100000);
-            flight_delay_loop_ms(100);
+            usleep(100 * 1000);
+            //flight_delay_loop_ms(100);
             loop_count++;
             gp = vehicle->broadcast->getGlobalPosition();
-            printf("gp.alttitude %ld", loop_count);
+            printf("gp.alttitude %ld\n", loop_count);
         } while (gp.altitude != 0 && loop_count < timeoutCycles);
 
         if (gp.altitude != 0)
@@ -844,13 +844,13 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
     }
     else // M100
     {
-        timeoutCycles = 20;
+        timeoutCycles = 300;
         loop_count = 0;
         while (vehicle->broadcast->getStatus().flight == DJI::OSDK::VehicleStatus::M100FlightStatus::FINISHING_LANDING &&
                loop_count < timeoutCycles)
         {
-            //usleep(100000);
-            flight_delay_loop_ms(100);
+            usleep(100 * 1000);
+            //flight_delay_loop_ms(100);
             loop_count++;
             printf("BBBBB- %ld", loop_count);
         }
@@ -859,11 +859,11 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
         loop_count = 0;
         do
         {
-            //usleep(100000);
-            flight_delay_loop_ms(100);
+            usleep(100 * 1000);
+            //flight_delay_loop_ms(100);
             loop_count++;
             gp = vehicle->broadcast->getGlobalPosition();
-            printf("gp.alttitude %ld", loop_count);
+            printf("gp.alttitude %ld\n", loop_count);
         } while (gp.altitude != 0 && loop_count < timeoutCycles);
 
         if (gp.altitude != 0)
