@@ -740,10 +740,11 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
                landingNotStarted < timeoutCycles)
         {
             landingNotStarted++;
-            //usleep(10000);
-            flight_delay_loop_ms(10);
+            usleep(100 * 1000);
+            //flight_delay_loop_ms(10);
             
-            printf("NNNNN- %ld", loop_count);
+            loop_count++;
+            printf("NNNNN- %ld\n", loop_count);
         }
 
         if (landingNotStarted >= timeoutCycles)
@@ -796,10 +797,10 @@ bool monitoredLanding(Vehicle *vehicle, int timeout)
                vehicle->subscribe->getValue<TOPIC_STATUS_FLIGHT>() == VehicleStatus::FlightStatus::IN_AIR &&
                loop_count < timeoutCycles)
         {
-            //usleep(100000);
-            flight_delay_loop_ms(100);
+            usleep(100 * 1000);
+            //flight_delay_loop_ms(100);
             loop_count++;
-            printf("QQQQQ- %ld", loop_count);
+            printf("QQQQQ- %ld\n", loop_count);
         }
 
         if (vehicle->subscribe->getValue<TOPIC_STATUS_DISPLAYMODE>() != VehicleStatus::DisplayMode::MODE_P_GPS ||
