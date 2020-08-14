@@ -409,10 +409,14 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
 
     if (!vehicle->isM100() && !vehicle->isLegacyM600())
     {
-        currentSubscriptionGPS = vehicle->subscribe->getValue<TOPIC_GPS_FUSED>();
-        originSubscriptionGPS = currentSubscriptionGPS;
-        localOffsetFromGpsOffset(vehicle, localOffset, static_cast<void *>(&currentSubscriptionGPS), static_cast<void *>(&originSubscriptionGPS));
+        // currentSubscriptionGPS = vehicle->subscribe->getValue<TOPIC_GPS_FUSED>();
+        // originSubscriptionGPS = currentSubscriptionGPS;
+        // localOffsetFromGpsOffset(vehicle, localOffset, static_cast<void *>(&currentSubscriptionGPS), static_cast<void *>(&originSubscriptionGPS));
         
+        currentBroadcastGP = vehicle->broadcast->getGlobalPosition();
+        originBroadcastGP = currentBroadcastGP;
+        localOffsetFromGpsOffset(vehicle, localOffset, static_cast<void *>(&currentBroadcastGP), static_cast<void *>(&originBroadcastGP));
+      
         // Get the broadcast GP since we need the height for zCmd
         currentBroadcastGP = vehicle->broadcast->getGlobalPosition();
     }
@@ -494,7 +498,8 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
 
     if (!vehicle->isM100() && !vehicle->isLegacyM600())
     {
-        zCmd = currentSubscriptionGPS.altitude + zOffsetDesired;
+        // zCmd = currentSubscriptionGPS.altitude + zOffsetDesired;
+        zCmd = currentBroadcastGP.altitude + zOffsetDesired;
     }
     else
     {
@@ -520,10 +525,15 @@ bool moveByPositionOffset(Vehicle *vehicle, float xOffsetDesired, float yOffsetD
         //! Get current position in required coordinates and units
         if (!vehicle->isM100() && !vehicle->isLegacyM600())
         {
-            subscriptionQ = vehicle->subscribe->getValue<TOPIC_QUATERNION>();
-            yawInRad = toEulerAngle((static_cast<void *>(&subscriptionQ))).z;
-            currentSubscriptionGPS = vehicle->subscribe->getValue<TOPIC_GPS_FUSED>();
-            localOffsetFromGpsOffset(vehicle, localOffset, static_cast<void *>(&currentSubscriptionGPS), static_cast<void *>(&originSubscriptionGPS));
+            // subscriptionQ = vehicle->subscribe->getValue<TOPIC_QUATERNION>();
+            // yawInRad = toEulerAngle((static_cast<void *>(&subscriptionQ))).z;
+            // currentSubscriptionGPS = vehicle->subscribe->getValue<TOPIC_GPS_FUSED>();
+            // localOffsetFromGpsOffset(vehicle, localOffset, static_cast<void *>(&currentSubscriptionGPS), static_cast<void *>(&originSubscriptionGPS));
+
+            broadcastQ = vehicle->broadcast->getQuaternion();
+            yawInRad = toEulerAngle((static_cast<void *>(&broadcastQ))).z;
+            currentBroadcastGP = vehicle->broadcast->getGlobalPosition();
+            localOffsetFromGpsOffset(vehicle, localOffset, static_cast<void *>(&currentBroadcastGP), static_cast<void *>(&originBroadcastGP));
 
             // Get the broadcast GP since we need the height for zCmd
             currentBroadcastGP = vehicle->broadcast->getGlobalPosition();

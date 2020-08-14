@@ -211,9 +211,14 @@ std::vector<DJI::OSDK::WayPointSettings> createWaypoints(DJI::OSDK::Vehicle *veh
 
     if (!vehicle->isM100() && !vehicle->isLegacyM600())
     {
-        subscribeGPosition = vehicle->subscribe->getValue<TOPIC_GPS_FUSED>();
-        start_wp.latitude = subscribeGPosition.latitude;
-        start_wp.longitude = subscribeGPosition.longitude;
+        // subscribeGPosition = vehicle->subscribe->getValue<TOPIC_GPS_FUSED>();
+        // start_wp.latitude = subscribeGPosition.latitude;
+        // start_wp.longitude = subscribeGPosition.longitude;
+        // start_wp.altitude = alt;
+
+        broadcastGPosition = vehicle->broadcast->getGlobalPosition();
+        start_wp.latitude = broadcastGPosition.latitude;
+        start_wp.longitude = broadcastGPosition.longitude;
         start_wp.altitude = alt;
 
         // printf("Waypoint created at (LLA): %f \t%f \t%f\n", subscribeGPosition.latitude, subscribeGPosition.longitude, alt);
